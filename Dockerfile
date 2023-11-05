@@ -9,6 +9,7 @@ COPY . /app
 EXPOSE 3000
 
 ## Until I can work through the pyodide build issues ...
+RUN npm install 
 CMD ["npm", "start"]
 
 
