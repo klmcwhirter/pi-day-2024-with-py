@@ -1,17 +1,34 @@
-import { Component } from 'solid-js';
-import { PiAdapterProvider } from './py/pi.context';
-import PyVersionsView from './py/py-versions';
-import PiDigitsView from './py/pi-digits';
+import { Component, createSignal } from 'solid-js';
+import {
+  AppDescription,
+  Footer,
+  Header,
+  NavSwitcher,
+  NavView,
+} from './components';
+import { PiAdapterProvider } from './pi/pi.context';
+import PyVersionsView from './pi/py-versions';
+
+export const AppStateEnum = {
+  DIGITS: 'DIGITS',
+  HISTOGRAM: 'HISTOGRAM',
+};
 
 const App: Component = () => {
+  const stateSignal = createSignal<string>(AppStateEnum.DIGITS);
+
   return (
     <div class='text-center'>
-      <h1 class='py-2 text-center text-4xl text-green-700'>
-        Welcome to Pi Day 2024 with Python!
-      </h1>
+      <Header />
       <PiAdapterProvider>
-        <PiDigitsView />
-        <PyVersionsView />
+        <div class='grid grid-cols-4 gap-2'>
+          <NavView state={stateSignal} />
+          <NavSwitcher state={stateSignal} />
+          <AppDescription state={stateSignal} />
+        </div>
+        <Footer>
+          <PyVersionsView />
+        </Footer>
       </PiAdapterProvider>
     </div>
   );
