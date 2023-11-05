@@ -2,20 +2,22 @@
 
 ## References
 
-- [CPython Tools/wasm](https://github.com/python/cpython/tree/main/Tools/wasm)
-
-- [FORK of CPython - Tools/wasm](https://github.com/klmcwhirter/cpython/tree/main/Tools/wasm)
-
-- ["What can't WebAssembly do?" - Katie Bell (PyCon AU 2023)](https://youtu.be/JbZAsSzzk0E?si=qPbdAMYjSy4bMRzj)
-- [Porting Python to WebAssembly - Christian Heimes, Red Hat](https://youtu.be/B52cSnNOrFM?si=rQMe3HJooin0Zn1Z)
-
----
+- [Running Python packages in the browser with Pyodide — Roman Yurchak](https://youtu.be/fNv45zvs9pU?si=v5LE59uSG_ar_IsL)
 
 - [pyodide Quick Start](https://pyodide.org/en/stable/usage/quickstart.html)
 - [Using Pyodide in a web worker](https://pyodide.org/en/stable/usage/webworker.html)
 - [Extending web applications with WebAssembly and Python](https://wasmlabs.dev/articles/wasm-host-to-python/)
 - [pyodide Vite cleanup](https://pyodide-components.readthedocs.io/en/latest/vite_cleanup.html)
 - [pyodide issue - loadPyodide](https://github.com/vitejs/vite/discussions/12052)
+
+---
+
+- [CPython Tools/wasm](https://github.com/python/cpython/tree/main/Tools/wasm)
+
+- [FORK of CPython - Tools/wasm](https://github.com/klmcwhirter/cpython/tree/main/Tools/wasm)
+
+- ["What can't WebAssembly do?" - Katie Bell (PyCon AU 2023)](https://youtu.be/JbZAsSzzk0E?si=qPbdAMYjSy4bMRzj)
+- [Porting Python to WebAssembly - Christian Heimes, Red Hat](https://youtu.be/B52cSnNOrFM?si=rQMe3HJooin0Zn1Z)
 
 ---
 

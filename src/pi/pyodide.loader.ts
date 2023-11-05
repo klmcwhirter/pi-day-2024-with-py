@@ -4,17 +4,21 @@ let pyodide;
 
 const range = (n): number[] => [...Array(n).keys()];
 
-// Note that 32 * 32 = 1024
 const ROWS = 32;
 const COLS = 32;
+// Note that 32 * 32 = 1024
+export const NUM_DIGITS = ROWS * COLS;
 
 export class PiAdapter {
   constructor(public piaProxy) {
     this.piaProxy = piaProxy;
     if (!this.piaProxy) {
       this.piaProxy = {
-        pi_digits: () => [],
-        version: () => 'Proxy is loading ...',
+        histogram: (num_digits: number) => {
+          return [];
+        },
+        pi_digits: (num_digits: number) => [],
+        version: (): string[] => ['Proxy is loading ...'],
       };
     }
   }
@@ -23,21 +27,18 @@ export class PiAdapter {
     this.piaProxy.destroy();
   }
 
+  histogram() {
+    const rc = this.piaProxy.histogram(NUM_DIGITS);
+    return rc;
+  }
+
   pi_digits() {
-    const digits = this.piaProxy.pi_digits();
-    const rc = [];
-    for (const r of range(ROWS)) {
-      const row = [];
-      for (const c of range(COLS)) {
-        row.push(digits[r * COLS + c]);
-      }
-      rc.push(row);
-    }
+    const rc = this.piaProxy.pi_digits(NUM_DIGITS, COLS);
     return rc;
   }
 
   version(): string[] {
-    return [`pyodide.version: ${pyodide?.version}`, this.piaProxy.version()];
+    return [`pyodide.version: ${pyodide?.version}`, ...this.piaProxy.version()];
   }
 }
 
@@ -52,6 +53,8 @@ const loadPiadapter = async (pyodide) => {
 
 export const loadPython = async (_load: boolean): Promise<PiAdapter> => {
   pyodide = await loadPyodide();
+  pyodide.setStderr({ batched: console.log });
+  pyodide.setStdout({ batched: console.log });
   console.log('from JS: back from loading pyodide', pyodide);
 
   const pia = await loadPiadapter(pyodide);
