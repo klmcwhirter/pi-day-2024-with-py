@@ -1,6 +1,7 @@
 version: '3.8'
 services:
   piday2024:
+    restart: unless-stopped
     ports:
       - 3000:3000
     build:
@@ -8,8 +9,6 @@ services:
       dockerfile: Dockerfile
     deploy:
       replicas: 1
-      update_config:
-        parallelism: 1
-        delay: 10s
       restart_policy:
-        condition: on-failure
+        condition: any
+        max_attempts: 2
