@@ -3,12 +3,9 @@ services:
   piday2024:
     restart: unless-stopped
     ports:
-      - 3000:3000
+      - 9000:9000
     build:
       context: .
       dockerfile: Dockerfile
     deploy:
       replicas: 1
-      restart_policy:
-        condition: any
-        max_attempts: 2
