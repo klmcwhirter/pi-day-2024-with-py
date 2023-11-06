@@ -1,4 +1,4 @@
-import { For, Match, Switch } from 'solid-js';
+import { For, Match, Show, Switch, createSignal } from 'solid-js';
 import { PiDigitsHistoView, PiDigitsView } from './pi/pi-digits';
 import { AppStateEnum } from './App';
 import { ReadmeSnippet } from './ReadmeSnippet';
@@ -44,6 +44,27 @@ export const Bar = (props) => {
         {value}
       </span>
     </div>
+  );
+};
+
+export const ExpandableSection = (props) => {
+  const classes = props.class;
+  const expanded_default = props.default || false;
+  const fallback = props.fallback;
+
+  const [expanded, setExpanded] = createSignal(expanded_default);
+
+  const toggleExpanded = (evt) => setExpanded((prev) => !prev);
+
+  return (
+    <section
+      class={`${classes} hover:cursor-pointer hover:font-semibold hover:underline`}
+      onclick={toggleExpanded}
+    >
+      <Show when={!expanded()}>{fallback}</Show>
+
+      <Show when={expanded()}>{props.children}</Show>
+    </section>
   );
 };
 
@@ -110,7 +131,7 @@ export const NavView = (props) => {
 
   return (
     <nav class='m-4 rounded-lg bg-stone-200'>
-      <ul>
+      <ul class='shadow-lg'>
         <For each={appStates}>
           {(s) => (
             <li class='p-2'>
