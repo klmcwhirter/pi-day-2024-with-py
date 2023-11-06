@@ -7,7 +7,7 @@ const PyVersionsView: Component = () => {
   return (
     <div>
       <For each={piState.piAdapter().version()}>
-        {(s) => <span class='p-2 text-center text-xs'>{s}</span>}
+        {(s) => <span class='p-2'>{s}</span>}
       </For>
     </div>
   );

@@ -2,76 +2,28 @@ import { For, Match, Switch } from 'solid-js';
 import { PiDigitsHistoView, PiDigitsView } from './pi/pi-digits';
 import { AppStateEnum } from './App';
 
-export const AppDescription = (props) => {
-  const [state] = props.state;
-
-  return (
-    <div class='m-6 bg-amber-50 p-2 text-left text-lg italic text-emerald-600 shadow-xl shadow-neutral-400'>
-      <p class='p-2'>
-        This year I set out to do something really unusual. I picked an
-        architectural pattern first and looked for requirements that could use
-        it.
-      </p>
-
-      <p class='p-2'>This is usually a very bad idea.</p>
-
-      <p class='p-2'>
-        But, my ultimate goal was to explore ways in which web apps could be
-        built with a Python (Pyodide) WASM component providing the "business
-        logic".
-      </p>
-
-      <p class='p-2'>With that in mind, I have built the following:</p>
-
-      <ul class='list-disc p-2'>
-        <li class='m-2 p-2'>
-          <span
-            class='rounded-md p-2 font-semibold not-italic'
-            classList={{
-              'bg-emerald-500 text-amber-100': state() == AppStateEnum.DIGITS,
-            }}
-          >
-            digits of Pi
-          </span>{' '}
-          - shows a grid of squares whose background-color is mapped to a
-          pallette of colors corresponding to the digits 0-9.
-        </li>
-        <li class='m-2 p-2'>
-          <span
-            class='rounded-md p-2 font-semibold not-italic'
-            classList={{
-              'bg-emerald-500 text-amber-100':
-                state() == AppStateEnum.HISTOGRAM,
-            }}
-          >
-            histogram
-          </span>{' '}
-          - shows the number of times a digit appears in pi (well, at least the
-          first 1024 digits)
-        </li>
-      </ul>
-    </div>
-  );
-};
-
-const TOTAL_WIDTH = 32; // in rem
-
 export const Bar = (props) => {
+  const TOTAL_WIDTH = 32; // in rem
+
   const label = props.label;
   const value = props.value;
-  const total = props.total;
-  const pct = ((value / total) * 100.0).toFixed(2) + '%';
+
+  const maxValue = props.maxValue;
+  const minValue = props.minValue;
 
   const color = props.color;
   const shadow = props.shadow;
-  const ratio = parseFloat(((value * 2) / total).toFixed(2));
 
+  const total = props.total;
+  const pct = ((value / total) * 100.0).toFixed(2) + '%';
+
+  const ratio = (value * 2) / total;
   const width = `${TOTAL_WIDTH * ratio}rem`;
   const rest = `${TOTAL_WIDTH - TOTAL_WIDTH * ratio}rem`;
 
   return (
-    <div class={`mb-4 text-left shadow-lg ${shadow}`}>
-      <span class='h-8 p-0.5 pr-1 text-center text-lg font-medium'>
+    <div class={`mb-6 bg-stone-200 text-left shadow-lg ${shadow}`}>
+      <span class='inline-block h-8 border border-r-stone-400 bg-stone-100 p-0.5 !pr-1 text-center text-lg font-medium'>
         {label}
       </span>
       <span
@@ -81,7 +33,11 @@ export const Bar = (props) => {
         {pct}
       </span>
       <span
-        class='inline-block h-8 bg-neutral-200 p-0.5 text-right text-lg font-medium'
+        class='inline-block h-8 bg-stone-200 p-0.5 text-right'
+        classList={{
+          'font-bold text-2xl text-green-500': value === maxValue,
+          'font-bold text-2xl text-yellow-800': value === minValue,
+        }}
         style={`width: ${rest}`}
       >
         {value}
@@ -92,15 +48,21 @@ export const Bar = (props) => {
 
 export const Footer = (props) => {
   return (
-    <div class='mb-0 bg-blue-700 p-2 text-green-300'>{props.children}</div>
+    <div class='mb-0 bg-blue-700 p-2 text-center text-xs text-green-300 hover:p-0.5 hover:text-lg hover:font-bold'>
+      {props.children}
+    </div>
   );
 };
 
 export const Header = (props) => {
   return (
-    <h1 class='mt-0 bg-blue-700 p-2 text-center text-4xl text-green-300'>
-      Welcome to Pi Day 2024 with Python (and WASM)!
-    </h1>
+    <div class='mt-0 bg-blue-700 p-2'>
+      <img src='./pi.svg' class='mr-12 inline w-14' />
+
+      <h1 class='inline fill-green-300 text-center align-middle text-4xl text-green-300'>
+        Welcome to Pi Day 2024 with Python (and WASM) !
+      </h1>
+    </div>
   );
 };
 
@@ -108,7 +70,7 @@ export const NavSwitcher = (props) => {
   const [state] = props.state;
 
   return (
-    <div class='col-span-2 col-start-2 mx-auto h-[90vh]'>
+    <div class='col-span-2 col-start-2 mx-auto h-[89vh]'>
       <Switch>
         <Match when={state() === AppStateEnum.DIGITS}>
           <PiDigitsView />
@@ -126,16 +88,16 @@ export const NavView = (props) => {
   const appStates = [AppStateEnum.DIGITS, AppStateEnum.HISTOGRAM];
 
   return (
-    <nav class='m-4 bg-amber-50'>
+    <nav class='m-4 rounded-lg bg-stone-200'>
       <ul>
         <For each={appStates}>
           {(s) => (
             <li class='p-2'>
               <a
                 class='m-2 block p-2 text-lg text-blue-700
-                hover:rounded-lg hover:bg-emerald-700 hover:font-bold hover:text-white'
+                hover:cursor-pointer hover:rounded-lg hover:bg-emerald-700 hover:font-bold hover:text-white'
                 classList={{
-                  'rounded-lg bg-emerald-500 font-semibold text-white':
+                  'rounded-lg bg-emerald-500 font-bold text-white shadow-xl':
                     state() === s,
                 }}
                 onclick={() => setState(s)}

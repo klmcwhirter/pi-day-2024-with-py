@@ -1,11 +1,6 @@
 import { Component, createSignal } from 'solid-js';
-import {
-  AppDescription,
-  Footer,
-  Header,
-  NavSwitcher,
-  NavView,
-} from './components';
+import { AppDescription } from './AppDescription';
+import { Footer, Header, NavSwitcher, NavView } from './components';
 import { PiAdapterProvider } from './pi/pi.context';
 import PyVersionsView from './pi/py-versions';
 
