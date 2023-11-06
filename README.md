@@ -20,7 +20,7 @@ There are 3 main features represented by the screenshots below.
 >
 > But it was fun to build and shows something else that is possible with WASM.
 
-I do think this pattern has promise, but not just yet. It is a little too early. If you notice the version numbers of a lot of the tech involved - many are not at version 1.0 yet. And there is a lot of integrated tech involved! Many people have contributed to what you see here.
+I do think this pattern has promise, but not just yet. It is a little too early. If you notice the version numbers of some of the tech involved are not at version 1.0 yet. And there is a lot of integrated tech involved! Many people have contributed to what you see here.
 
 It may not seem earth shattering, but I am blown away.
 
@@ -29,10 +29,10 @@ The Python code in the WASM component can do:
 - data crunching (data science libraries e.g., numpy, pandas, etc. come built into pyodide) - even though I am not using them on purpose
 - make API calls
 - use Python skilled resources on the team where it make sense to do so
-- just leverage the more expressive nature of Python vs JavaScript to get the job done in a more maintainable way
-- keep the very mature UI workflows using vite, webpack, etc.
+- leverage the more expressive nature of Python vs JavaScript to get the job done in a more maintainable way
+- keep the very mature UI workflows using vite, webpack, etc. in place
 - expand the (dare I say muddy the waters) conversation about a distributed presentation layer some more
-- nodejs, SSR, now rust - WASM is a natural addition to the distributed presentation question whether it be client or server side (as you will find readily available commentary)
+- nodejs, SSR, now rust - WASM is a natural addition to the distributed presentation discussion whether it be client or server side (as you will find readily available commentary)
 
 Here I only pursue client side - because it was fun to do and I was curious.
 
