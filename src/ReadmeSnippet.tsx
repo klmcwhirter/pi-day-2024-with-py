@@ -1,5 +1,11 @@
+import { ExpandableSection } from './components';
+
 export const ReadmeSnippet = () => (
-  <div class='m-4 border-t-2 border-t-blue-500/20 p-2 text-left text-sm text-blue-600'>
+  // border-t-2 border-t-blue-500/20
+  <ExpandableSection
+    class='m-4 p-2 text-left text-sm text-blue-600'
+    fallback={<p class='mt-4'>Expand Readme snippet ...</p>}
+  >
     <p class='mt-4'>
       I do think this pattern has promise, but not just yet. It is a little too
       early. If you notice the version numbers of some of the tech involved are
@@ -54,5 +60,5 @@ export const ReadmeSnippet = () => (
       After all, pi day is about celebrating PI vs TAU (from a mathematical
       perspective) and, in my case, practicing the skills of my craft.
     </p>
-  </div>
+  </ExpandableSection>
 );
