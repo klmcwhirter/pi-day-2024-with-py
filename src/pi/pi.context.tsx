@@ -9,7 +9,7 @@ export class PiState {
 const PiStateContext = createContext<PiState>();
 
 export const PiAdapterProvider = (props) => {
-  const [piAdapter, { mutate: mutatePiAdapter }] = createResource(loadPython, {
+  const [piAdapter] = createResource(loadPython, {
     initialValue: new PiAdapter(null),
   });
   const piState = new PiState(piAdapter);

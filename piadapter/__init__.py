@@ -4,7 +4,6 @@ import logging
 import os
 import sys
 from collections import defaultdict
-from typing import Iterable
 
 from piadapter.pi_digits import pi_digit_generator
 from piadapter.utils import batched
@@ -27,7 +26,7 @@ class PiAdapter:
         rc = [counter[k] for k in sorted(counter)]
 
         from pprint import pformat
-        logging.info(f'PiAdapter.histogram({num_digits}: {pformat(counter)}={pformat(rc)}')
+        logging.info(f'PiAdapter.histogram({num_digits}: {pformat(rc)}')
 
         return rc
 
