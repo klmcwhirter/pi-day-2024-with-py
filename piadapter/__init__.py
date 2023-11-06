@@ -3,9 +3,8 @@
 import logging
 import os
 import sys
-from collections import defaultdict
 
-from piadapter.pi_digits import pi_digit_generator
+from piadapter.pi_digits import pi_digit_generator, pi_digits_histogram
 from piadapter.utils import batched
 
 logging.basicConfig(level=logging.DEBUG, format='PYTHON: {asctime} - {module} - {funcName} - {levelname} - {message}', style='{')
@@ -19,11 +18,8 @@ class PiAdapter:
         return 'PiAdapter()'
 
     def histogram(self, num_digits: int) -> list[int]:
-        counter = defaultdict(int)
-        for n in pi_digit_generator(num_digits):
-            counter[n] += 1
 
-        rc = [counter[k] for k in sorted(counter)]
+        rc = pi_digits_histogram(num_digits)
 
         from pprint import pformat
         logging.info(f'PiAdapter.histogram({num_digits}): {pformat(rc)}')
