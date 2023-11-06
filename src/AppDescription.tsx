@@ -38,7 +38,9 @@ export const AppDescription = (props) => {
       <ul>
         <li class='mt-2'>
           <p>
-            &pi;{' '}
+            <span class='text-md ml-2 bg-stone-100 p-1 not-italic text-purple-700'>
+              &pi;
+            </span>
             <span
               class='rounded-md p-2'
               classList={classlistFor(state(), AppStateEnum.DIGITS, true)}
@@ -67,7 +69,9 @@ export const AppDescription = (props) => {
         </li>
         <li class='mt-2'>
           <p>
-            &pi;{' '}
+            <span class='text-md ml-2 bg-stone-100 p-1 not-italic text-purple-700'>
+              &pi;
+            </span>
             <span
               class='rounded-md p-2'
               classList={classlistFor(state(), AppStateEnum.HISTOGRAM, true)}
@@ -90,6 +94,10 @@ export const AppDescription = (props) => {
             classList={classlistFor(state(), AppStateEnum.HISTOGRAM)}
           >
             The presentation is written in Typescript and uses SolidJS.
+          </p>
+          <p class='mb-0 mt-2 text-sm'>
+            Don't forget to look at console.log for 'PYTHON'. Those are
+            generated directly from the Python stdlib logging module.
           </p>
         </li>
       </ul>

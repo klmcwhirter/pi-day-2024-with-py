@@ -26,13 +26,13 @@ class PiAdapter:
         rc = [counter[k] for k in sorted(counter)]
 
         from pprint import pformat
-        logging.info(f'PiAdapter.histogram({num_digits}: {pformat(rc)}')
+        logging.info(f'PiAdapter.histogram({num_digits}): {pformat(rc)}')
 
         return rc
 
     def pi_digits(self, num_digits: int, n: int) -> list[list[int]]:
         '''Return num_digits of PI batched n at a time'''
-        logging.info('PiAdapter.pi_digits(%d,%d)', num_digits, n)
+        logging.info(f'PiAdapter.pi_digits({num_digits}, {n})')
         return [da for da in batched([int(digit) for digit in pi_digit_generator(num_digits)], n)]
 
     def version(self):
