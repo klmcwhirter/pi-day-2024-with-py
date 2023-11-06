@@ -1,6 +1,8 @@
 version: '3.8'
 services:
   piday2024:
+    environment:
+      TZ: PST8PDT
     restart: unless-stopped
     ports:
       - 9000:9000
