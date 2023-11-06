@@ -1,4 +1,4 @@
-# pi-day-2024-with-py
+# &pi; pi-day-2024-with-py
 
 In spirit, this is just a reimplementation of [pi-day-2021-with-py](https://github.com/klmcwhirter/pi-day-2021-with-py). But it is, oh, so more than that.
 
@@ -8,7 +8,7 @@ Pyodide provides Python (version 3.11.3 as I write this including most of stdlib
 
 The UI interacts with the Python WASM component via Typescript.
 
-The meat of that is in [pyodide.loader.ts](./src/py/pyodide.loader.ts) and the [piadapter](./piadapter/__init__.py) Python module.
+The meat of that is in [pyodide.loader.ts](./src/pi/pyodide.loader.ts) and the [piadapter](./piadapter/__init__.py) Python module.
 
 There are 3 main features represented by the screenshots below.
 
@@ -63,4 +63,3 @@ Nothing I found was as ready to use as pyodide - search stopped there for now.
 ## Notes
 
 - [References](References)
-- [TODO](TODO)

@@ -1,4 +1,4 @@
-'''main.py - pyodide component entry point'''
+'''piadapter - pyodide Python component target from web app'''
 
 import logging
 import os
