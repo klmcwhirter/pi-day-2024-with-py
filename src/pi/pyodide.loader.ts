@@ -1,44 +1,41 @@
-import { loadPyodide } from '/node_modules/pyodide/pyodide.mjs';
+import { loadPyodide, PyProxy } from '/node_modules/pyodide/pyodide.mjs';
 
 let pyodide;
 
-const ROWS = 32;
-const COLS = 32;
-// Note that 32 * 32 = 1024
-export const NUM_DIGITS = ROWS * COLS;
-
 export class PiAdapter {
-  constructor(public piaProxy) {
-    this.piaProxy = piaProxy;
-
+  constructor(public piaProxy: PyProxy) {
     // Provide default implementation while loading
     if (!this.piaProxy) {
       this.piaProxy = {
-        histogram: (num_digits: number) => {
+        histogram: (num_digits: number): number[] => {
           return [];
         },
-        pi_digits: (num_digits: number) => [],
+        pi_digits: (num_digits: number, n: number): [number[]] => [[]],
         version: (): string[] => ['Python is loading ...'],
       };
     }
   }
 
   destroy_proxy() {
-    this.piaProxy.destroy();
+    this.piaProxy?.destroy();
   }
 
-  histogram() {
-    const rc = this.piaProxy.histogram(NUM_DIGITS);
+  histogram(num_digits: number): number[] {
+    console.log(`JS: histogram(${num_digits})`);
+    const rc = this.piaProxy?.histogram(num_digits) || [];
     return rc;
   }
 
-  pi_digits() {
-    const rc = this.piaProxy.pi_digits(NUM_DIGITS, COLS);
+  pi_digits(num_digits: number, n: number): number[] {
+    console.log(`JS: pi_digits(${num_digits}, ${n})`);
+    const rc = this.piaProxy?.pi_digits(num_digits, n) || [];
     return rc;
   }
 
   version(): string[] {
-    return [`pyodide.version: ${pyodide?.version}`, ...this.piaProxy.version()];
+    console.log('JS: version()');
+    const pyVersions = this.piaProxy?.version() || [];
+    return [`pyodide.version: ${pyodide?.version}`, ...pyVersions];
   }
 }
 
@@ -68,5 +65,15 @@ export const loadPython = async (_load: boolean): Promise<PiAdapter> => {
     'JS: The server can be shutdown now. Everything is running here.',
   );
 
+  // seed the cache
+  for (const n of WELL_KNOWN_NUMS.toReversed()) {
+    // optimize caching of digits via toReversed above
+    piAdapter.histogram(n);
+  }
+
   return piAdapter;
 };
+
+export const WELL_KNOWN_NUMS: number[] = [
+  10, 100, 1000, 1024, 10000, 20000, 25000,
+];

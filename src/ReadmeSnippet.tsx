@@ -1,10 +1,9 @@
 import { ExpandableSection } from './components';
 
 export const ReadmeSnippet = () => (
-  // border-t-2 border-t-blue-500/20
   <ExpandableSection
-    class='m-4 p-2 text-left text-sm text-blue-600'
-    fallback={<p class='mt-4'>Expand Readme snippet ...</p>}
+    class='hover:text-md m-4 rounded-lg bg-stone-300 p-2 text-left text-sm text-blue-600 ring-1 ring-stone-500'
+    fallback={<p>Expand Readme snippet ...</p>}
   >
     <p class='mt-4'>
       I do think this pattern has promise, but not just yet. It is a little too
