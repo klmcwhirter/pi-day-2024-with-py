@@ -75,5 +75,5 @@ export const loadPython = async (_load: boolean): Promise<PiAdapter> => {
 };
 
 export const WELL_KNOWN_NUMS: number[] = [
-  10, 100, 1000, 1024, 10000, 20000, 25000,
+  10, 100, 1000, 1024, 10000, 20000, 25000, 30000,
 ];

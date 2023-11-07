@@ -7,7 +7,7 @@ from conftest import TimeoutException, time_limit
 from piadapter import PiAdapter
 from piadapter.pi_digits import pi_digit_generator
 
-MAX_SECS = 10
+MAX_SECS = 30
 
 __adapter = PiAdapter()
 
@@ -33,9 +33,11 @@ def test_pi_digit_generator_first_10():
             marks=[pytest.mark.slow, pytest.mark.skip(reason=f'times out at MAX_SECS={MAX_SECS}')]),
         pytest.param(50000, [], marks=[
                      pytest.mark.slow, pytest.mark.skip(reason=f'times out at MAX_SECS={MAX_SECS}')]),
-        pytest.param(25000, [2476, 2519, 2403, 2492, 2549, 2567, 2541, 2479, 2465, 2509], marks=[pytest.mark.slow]),
-        pytest.param(20000, [1954, 1997, 1986, 1987, 2043, 2082, 2017, 1953, 1961, 2020], marks=[pytest.mark.slow]),
-        pytest.param(10000, [968, 1026, 1021, 975, 1012, 1046, 1021, 970, 947, 1014], marks=[pytest.mark.slow]),
+        pytest.param(40000, [3989, 4060, 3892, 3972, 4014, 4040, 4026, 3977, 4032, 3998], marks=[pytest.mark.slow]),
+        [30000, [2998, 3048, 2897, 2979, 3057, 3049, 3012, 2974, 2972, 3014]],
+        [25000, [2476, 2519, 2403, 2492, 2549, 2567, 2541, 2479, 2465, 2509]],
+        [20000, [1954, 1997, 1986, 1987, 2043, 2082, 2017, 1953, 1961, 2020]],
+        [10000, [968, 1026, 1021, 975, 1012, 1046, 1021, 970, 947, 1014]],
         [1024, [96, 117, 106, 105, 94, 101, 96, 97, 105, 107]],
         [1000, [93, 116, 103, 103, 93, 97, 94, 95, 101, 105]],
         [100, [8, 8, 12, 12, 10, 8, 9, 8, 12, 13]],
