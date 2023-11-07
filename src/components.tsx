@@ -1,47 +1,48 @@
-import { For, Match, Show, Switch, createSignal } from 'solid-js';
-import { PiDigitsHistoView, PiDigitsView } from './pi/pi-digits';
+import {
+  For,
+  Match,
+  Resource,
+  Show,
+  Suspense,
+  Switch,
+  createSignal,
+} from 'solid-js';
+import { PiDigitsHistogram, PiDigitsView } from './pi/pi-digits';
+import { HistogramItemValues, HistogramValues } from './pi/pi-digits.model';
 import { AppStateEnum } from './App';
 import { ReadmeSnippet } from './ReadmeSnippet';
 
 export const Bar = (props) => {
   const TOTAL_WIDTH = 32; // in rem
 
-  const label = props.label;
-  const value = props.value;
+  const item: HistogramItemValues = props.item;
+  const values: Resource<HistogramValues> = props.values;
 
-  const maxValue = props.maxValue;
-  const minValue = props.minValue;
-
-  const color = props.color;
-  const shadow = props.shadow;
-
-  const total = props.total;
-  const pct = ((value / total) * 100.0).toFixed(2) + '%';
-
-  const ratio = (value * 2) / total;
-  const width = `${TOTAL_WIDTH * ratio}rem`;
-  const rest = `${TOTAL_WIDTH - TOTAL_WIDTH * ratio}rem`;
+  const width = `${TOTAL_WIDTH * values().ratio(item.value * 2)}rem`;
+  const rest = `${
+    TOTAL_WIDTH - TOTAL_WIDTH * values().ratio(item.value * 2)
+  }rem`;
 
   return (
-    <div class={`mb-6 bg-stone-200 text-left shadow-lg ${shadow}`}>
+    <div class={`mb-6 bg-stone-200 text-left shadow-lg ${item.shadow}`}>
       <span class='inline-block h-8 border border-r-stone-400 bg-stone-100 p-0.5 !pr-1 text-center text-lg font-medium'>
-        {label}
+        {item.index}
       </span>
       <span
-        class={`${color} inline-block h-8 p-0.5 text-left text-lg font-medium`}
+        class={`${item.color} inline-block h-8 p-0.5 text-left text-lg font-medium`}
         style={`width: ${width}`}
       >
-        {pct}
+        <p class='inline-block'>{values().percent(item.value)}</p>
       </span>
       <span
         class='inline-block h-8 bg-stone-200 p-0.5 text-right'
         classList={{
-          'font-bold text-2xl text-green-500': value === maxValue,
-          'font-bold text-2xl text-yellow-800': value === minValue,
+          'font-bold text-2xl text-green-500': item.value === values().maxValue,
+          'font-bold text-xl text-yellow-800': item.value === values().minValue,
         }}
         style={`width: ${rest}`}
       >
-        {value}
+        {item.value}
       </span>
     </div>
   );
@@ -58,7 +59,7 @@ export const ExpandableSection = (props) => {
 
   return (
     <section
-      class={`${classes} hover:cursor-pointer hover:font-semibold hover:underline`}
+      class={`${classes} hover:cursor-pointer hover:font-semibold`}
       onclick={toggleExpanded}
     >
       <Show when={!expanded()}>{fallback}</Show>
@@ -113,14 +114,31 @@ export const NavSwitcher = (props) => {
 
   return (
     <div class='col-span-2 col-start-2 mx-auto h-[89vh]'>
-      <Switch>
-        <Match when={state() === AppStateEnum.DIGITS}>
-          <PiDigitsView />
-        </Match>
-        <Match when={state() === AppStateEnum.HISTOGRAM}>
-          <PiDigitsHistoView />
-        </Match>
-      </Switch>
+      <Suspense
+        fallback={
+          <div class='m-28 rounded-lg bg-stone-300 p-28 text-blue-700 shadow-2xl shadow-blue-900'>
+            <p class='text-6xl'>Loading lots of &pi; ...</p>
+            <p class='mt-10 text-2xl text-green-600'>
+              the server can be shut down now
+            </p>
+            <p class='mt-10 text-4xl text-purple-700'>
+              do examine the console.log !
+            </p>
+            <p class='mt-10 text-xl text-red-900'>
+              and hover over the footer so it can actually be read
+            </p>
+          </div>
+        }
+      >
+        <Switch>
+          <Match when={state() === AppStateEnum.DIGITS}>
+            <PiDigitsView />
+          </Match>
+          <Match when={state() === AppStateEnum.HISTOGRAM}>
+            <PiDigitsHistogram />
+          </Match>
+        </Switch>
+      </Suspense>
     </div>
   );
 };

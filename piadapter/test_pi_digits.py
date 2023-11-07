@@ -4,9 +4,17 @@ import timeit
 import pytest
 
 from conftest import TimeoutException, time_limit
-from piadapter.pi_digits import pi_digit_generator, pi_digits_histogram
+from piadapter import PiAdapter
+from piadapter.pi_digits import pi_digit_generator
 
 MAX_SECS = 10
+
+__adapter = PiAdapter()
+
+
+@pytest.fixture
+def adapter() -> PiAdapter:
+    return __adapter
 
 
 def test_pi_digit_generator_first_10():
@@ -19,23 +27,27 @@ def test_pi_digit_generator_first_10():
 @pytest.mark.parametrize(
     ['n', 'expected'],
     [
-        [10, [0, 2, 1, 2, 1, 2, 1, 0, 0, 1]],
-        [100, [8, 8, 12, 12, 10, 8, 9, 8, 12, 13]],
-        [1000, [93, 116, 103, 103, 93, 97, 94, 95, 101, 105]],
-        [1024, [96, 117, 106, 105, 94, 101, 96, 97, 105, 107]],
-        pytest.param(10000, [968, 1026, 1021, 975, 1012, 1046, 1021, 970, 947, 1014], marks=[pytest.mark.slow]),
         pytest.param(
             100000,  # times out
             [9999, 10137, 9908, 10026, 9971, 10026, 10028, 10025, 9978, 9902],
-            marks=[pytest.mark.slow, pytest.mark.skip(reason='times out')]),
+            marks=[pytest.mark.slow, pytest.mark.skip(reason=f'times out at MAX_SECS={MAX_SECS}')]),
+        pytest.param(50000, [], marks=[
+                     pytest.mark.slow, pytest.mark.skip(reason=f'times out at MAX_SECS={MAX_SECS}')]),
+        pytest.param(25000, [2476, 2519, 2403, 2492, 2549, 2567, 2541, 2479, 2465, 2509], marks=[pytest.mark.slow]),
+        pytest.param(20000, [1954, 1997, 1986, 1987, 2043, 2082, 2017, 1953, 1961, 2020], marks=[pytest.mark.slow]),
+        pytest.param(10000, [968, 1026, 1021, 975, 1012, 1046, 1021, 970, 947, 1014], marks=[pytest.mark.slow]),
+        [1024, [96, 117, 106, 105, 94, 101, 96, 97, 105, 107]],
+        [1000, [93, 116, 103, 103, 93, 97, 94, 95, 101, 105]],
+        [100, [8, 8, 12, 12, 10, 8, 9, 8, 12, 13]],
+        [10, [0, 2, 1, 2, 1, 2, 1, 0, 0, 1]],
     ]
 )
-def test_histogram_n_digits(n: int, expected: list[int]):
+def test_histogram_n_digits(adapter: PiAdapter, n: int, expected: list[int]):
     try:
         with time_limit(MAX_SECS):
-            rc = pi_digits_histogram(n)
+            rc = adapter.histogram(n)
     except TimeoutException as e:
-        pytest.fail(f'pi_digits_histogram(n={n}) timed out at MAX_SECS={MAX_SECS} seconds', pytrace=False)
+        pytest.fail(f'adapter.histogram(num_digits={n}) timed out at MAX_SECS={MAX_SECS} seconds', pytrace=False)
 
     assert expected == rc
 
@@ -44,7 +56,8 @@ collected: dict[int, list[int]] = {}
 
 
 def collect_histogram_for_n_digits(n: int):
-    rc = pi_digits_histogram(n)
+    adapter = PiAdapter()
+    rc = adapter.histogram(n)
     collected[n] = rc
     return rc
 

@@ -8,6 +8,8 @@ services:
       - 9000:9000
     build:
       context: .
+      args:
+        ENABLE_TESTS: 1
       dockerfile: Dockerfile
     deploy:
       replicas: 1

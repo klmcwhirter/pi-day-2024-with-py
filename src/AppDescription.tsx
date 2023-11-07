@@ -78,8 +78,7 @@ export const AppDescription = (props) => {
             >
               HISTOGRAM
             </span>{' '}
-            - shows the number of times a digit appears in pi (well, at least
-            the first 1024 digits)
+            - shows the number of times a digit appears in pi
           </p>
 
           <p

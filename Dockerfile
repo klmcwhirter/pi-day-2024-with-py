@@ -3,14 +3,12 @@
 #*----------------------------------------------------------------------
 
 FROM python:3.12-alpine as pythontests
+ARG ENABLE_TESTS
 WORKDIR /app
 COPY . /app
 
 RUN apk upgrade --no-cache && \
-./create_venv && \
-source .venv/bin/activate && \
-pytest 2>&1 >pytest.out && \
-mv pytest.out pythontests.passed
+ENABLE_TESTS=$ENABLE_TESTS ./etc/run_pytests.sh
 
 #*----------------------------------------------------------------------
 #* build

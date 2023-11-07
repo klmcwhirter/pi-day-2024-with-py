@@ -1,7 +1,19 @@
-import { Component, For } from 'solid-js';
-import { usePiState } from './pi.context';
+import {
+  Component,
+  For,
+  createResource,
+  createSignal,
+  Resource,
+} from 'solid-js';
 import { Bar } from '../components';
-import { NUM_DIGITS } from './pyodide.loader';
+import { usePiState } from './pi.context';
+import { HistogramItemValues, HistogramValues } from './pi-digits.model';
+import { WELL_KNOWN_NUMS } from './pyodide.loader';
+
+const ROWS = 32;
+const COLS = 32;
+// Note that 32 * 32 = 1024
+const NUM_DIGITS = ROWS * COLS;
 
 // purple,violet,blue,lightblue,green,yellow,orange,red,crimson,black
 
@@ -36,7 +48,7 @@ export const PiDigitsView: Component = (props) => {
 
   return (
     <div class='table h-full border-collapse bg-stone-100 align-middle'>
-      <For each={piState.piAdapter().pi_digits()}>
+      <For each={piState.piAdapter().pi_digits(NUM_DIGITS, COLS)}>
         {(row) => (
           <div class='table-row'>
             <For each={row}>
@@ -55,15 +67,35 @@ export const PiDigitsView: Component = (props) => {
   );
 };
 
-export const PiDigitsHistoView: Component = (props) => {
+const PiNumDigitsHistogram = (props) => {
+  const values: Resource<HistogramValues> = props.values;
+  return (
+    <div class='mt-2 p-2'>
+      <For each={values()?.items}>
+        {(e, i) => <Bar item={e} values={values} />}
+      </For>
+    </div>
+  );
+};
+
+export const PiDigitsHistogram: Component = (props) => {
   const piState = usePiState();
 
-  const values = piState
-    .piAdapter()
-    .histogram()
-    .map((v) => v);
-  const maxValue = Math.max(...values);
-  const minValue = Math.min(...values);
+  const fetchHistogram = async (n: number): Promise<HistogramValues> => {
+    const numbers: number[] = piState.piAdapter().histogram(n);
+    const items: HistogramItemValues[] = numbers.map(
+      (v: number, i: number): HistogramItemValues =>
+        new HistogramItemValues(i, v, pallette[i], shadow_pallette[i]),
+    );
+    const rc = new HistogramValues(n, items);
+    return Promise.resolve(rc);
+  };
+
+  const [selected, setSelected] = createSignal(NUM_DIGITS);
+  const [values] = createResource<HistogramValues, number>(
+    selected,
+    fetchHistogram,
+  );
 
   return (
     <div>
@@ -71,24 +103,21 @@ export const PiDigitsHistoView: Component = (props) => {
         <p class='text-2xl font-semibold'>
           Number of times each digit appears in Pi
         </p>
-        <p class='text-lg text-blue-500'>first 1024 digits</p>
+        <p class='text-lg text-blue-500'>
+          <span class='mr-2'>first</span>
+          <select
+            class='rounded-lg pl-2 pr-1 text-blue-800 ring-2 ring-stone-100 hover:font-semibold hover:ring-stone-500'
+            value={values()?.total}
+            onInput={(e) => setSelected(+e.currentTarget.value)}
+          >
+            <For each={WELL_KNOWN_NUMS}>
+              {(n) => <option value={n}>{n}</option>}
+            </For>
+          </select>
+          <span class='ml-2'>digits</span>
+        </p>
       </div>
-
-      <div class='mt-2 p-2'>
-        <For each={values}>
-          {(e, i) => (
-            <Bar
-              label={i()}
-              color={pallette[i()]}
-              shadow={shadow_pallette[i()]}
-              value={e}
-              maxValue={maxValue}
-              minValue={minValue}
-              total={NUM_DIGITS}
-            />
-          )}
-        </For>
-      </div>
+      <PiNumDigitsHistogram values={values} />
     </div>
   );
 };

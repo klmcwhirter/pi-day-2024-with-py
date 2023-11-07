@@ -7,12 +7,14 @@ D. Saada, S. Rabinowitz, mentioned on
 http://mail.python.org/pipermail/edu-sig/2012-December/010721.html).
 '''
 
-from collections import defaultdict
+import logging
 from typing import Generator
 
 
 def pi_digit_generator(num_digits: int) -> Generator[int, None, None]:
     '''Generate num_digits digits of Pi'''
+    logging.info(f'pi_digit_generator(num_digits={num_digits})')
+
     k, a, b, a1, b1 = 2, 4, 1, 12, 4
     while num_digits > 0:
         p, q, k = k * k, 2 * k + 1, k + 1
@@ -23,14 +25,3 @@ def pi_digit_generator(num_digits: int) -> Generator[int, None, None]:
             num_digits -= 1
             a, a1 = 10*(a % b), 10*(a1 % b1)
             d, d1 = a/b, a1/b1
-
-
-def pi_digits_histogram(num_digits: int) -> list[int]:
-    '''Generate a histogram of num_digits digits of Pi'''
-    counter = defaultdict(int)
-    for n in pi_digit_generator(num_digits=num_digits):
-        counter[n] += 1
-
-    rc = [counter[k] for k in range(10)]
-
-    return rc
