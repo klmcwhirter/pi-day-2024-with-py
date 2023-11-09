@@ -1,8 +1,21 @@
 # &pi; pi-day-2024-with-py
 
+##### Table of Contents
+
+- [Overview](#overview)
+- [Run it](#run-it)
+- [Why pyodide?](#why-pyodide)
+- [Downsides](#downsides)
+
+---
+
+<a name="#overview" />
+
+## Overview
+
 In spirit, this is just a reimplementation of [pi-day-2021-with-py](https://github.com/klmcwhirter/pi-day-2021-with-py). But it is, oh, so more than that.
 
-It uses [SolidJS](https://www.solidjs.com/) and [pyodide](https://pyodide.org/).
+It uses [SolidJS](https://www.solidjs.com/) and [pyodide](https://pyodide.org/), and runs completely in the browser.
 
 Pyodide provides Python (version 3.11.3 as I write this including most of stdlib and several data science libs) as a WASM component which runs in the browser. I use it via an adapter (or Proxy) because it contains the pi digit generator logic written in Python!
 
@@ -13,7 +26,7 @@ The meat of that is in [pyodide.loader.ts](./src/pi/pyodide.loader.ts) and the [
 There are 3 main features represented by the screenshots below.
 
 - 1024 Digits of Pi - [pi-day-2024-digits.png](pi-day-2024-digits.png) - this is a repeat of my [pi-day-2021-with-py](https://github.com/klmcwhirter/pi-day-2021-with-py) project where I did something similar with guizero
-- A histogram of the occurrences of the base 10 digits in the first 1024 digits of pi - [pi-day-2024-histogram.png](pi-day-2024-histogram.png)
+- A histogram of the occurrences of the base 10 digits in the first _selectable_ digits of pi - [pi-day-2024-histogram.png](pi-day-2024-histogram.png). The drop down contains values for 10 up to 30,000 digits of pi.
 - [pi-day-2024-footer.png](pi-day-2024-footer.png) - hover over the footer to see version information from both the python and Javascript parts of the app.
 - the loading screen that hides the initialization process is [pi-day-2024-loading.png](pi-day-2024-loading.png)
 
@@ -34,10 +47,13 @@ The Python code in the WASM component can do:
 - keep the very mature UI workflows using vite, webpack, etc. in place
 - expand (dare I say muddy the waters of) the conversation about a distributed presentation layer some more
 - nodejs, SSR, now rust - WASM is a natural addition to the distributed presentation discussion whether it be client or server side (as you will find readily available commentary)
+- integrating with other WASM components that will become available as things mature
 
 Here I only pursue client side - because it was fun to do and I was curious.
 
 After all, pi day is about celebrating PI vs TAU (from a mathematical perspective) and, in my case, practicing the skills of my craft.
+
+<a name="#run-it" />
 
 ## Run it ...
 
@@ -48,6 +64,8 @@ Just run `docker-compose up` and open [http://localhost:9000/](http://localhost:
 Hit CTRl-C twice! in the terminal where `docker-compose up` was executed to exit.
 
 Yes, twice.
+
+<a name="#why-pyodide" />
 
 ## Why pyodide?
 
@@ -67,11 +85,13 @@ Nothing I found was as ready to use as pyodide - search stopped there for now.
 
 - [References](References)
 
+<a name="downsides" />
+
 ## Downsides ...
 
 ### Downsides - Performance
 
-Because there is only a single accessible thread in the browser, performance will suffer when using this pattern. You are much better off hosting an API in another process and accessing it asynchronously (via fetch, et al). Even cooperative cycle sharing techniques (via features like [requestIdleCallback](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestIdleCallback)) just provide a sense of false hope.
+Because there is only a single accessible thread in the browser, performance will suffer when using this pattern. You are much better off hosting an API in another process and accessing it asynchronously (via fetch, et al). Even cooperative cycle sharing techniques (via features like [requestIdleCallback](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestIdleCallback)) just provide a false sense of hope.
 
 The reality is that any relatively long compute task (greater than 50ms according to the link above) will result in severely degraded perceived performance.
 
@@ -84,7 +104,7 @@ Here is what I did to improve the loading time.
   CPython 3.12 has some really interesting integrations with the perf utility on Linux.
   I used the following references to get prepared to use them.
 
-  - [CPython 3.21 profilers](https://docs.python.org/3.12/library/profile.html)
+  - [CPython 3.12 profilers](https://docs.python.org/3.12/library/profile.html)
   - [Profiling in Python: How to Find Performance Bottlenecks](https://realpython.com/python-profiling/)
 
   _See [./piadapter/profile_pi.py](./piadapter/profile_pi.py)._
@@ -107,7 +127,7 @@ Here is what I did to improve the loading time.
 
   Because pi_digit_generator is expected to be idempotent given some upper bound N num_digit value, I found it valuable to cache the output from just the upper bound. Any lower value of num_digits will share the same first set of digits.
 
-  Also, histograms consist of a list of 10 integers. So carefully placed usage of the functools.cache decorator means I can greatly improve perceived performance for values of nim_digits especially >=10_000.
+  Also, histograms consist of a list of 10 integers. So carefully placed usage of the functools.cache decorator means I can greatly improve perceived performance for values of num_digits especially >=10_000.
 
   ```python
       @cache
@@ -126,10 +146,10 @@ I could not get pyodide to fully coexist with my vite build system. I suspect, p
 
 _Get the core working first._
 
-Also, even though I am targeting the browser execution model, it seems to drag in nodejs modules for various things.
+Also, even though I am targeting the browser execution model, it seems to drag in nodejs modules for various things during the build process. Huh?
 
-I spent about 1/2 day looking for low hanging fruit but then decided to just use vite's built in dev server instead.
+I spent just a few hours looking for low hanging fruit but then decided to just use vite's built in dev server instead.
 
 The time needed to solve the CI/CD problem set is just not worth it for this silly little experiment of mine.
 
-Maybe in a year or two I will revisit it. Who knows. But pyodide should be much more stable then.
+Maybe in a year or two I will revisit it. Who knows. By then pyodide should be much more stable.
