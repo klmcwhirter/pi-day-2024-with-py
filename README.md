@@ -55,7 +55,7 @@ After all, pi day is about celebrating PI vs TAU (from a mathematical perspectiv
 
 <a name="#run-it" />
 
-## Run it ...
+## Run it
 
 The build and deployment relies on Docker and docker-compose. But those are the only dependencies (aside from an internet connection).
 
