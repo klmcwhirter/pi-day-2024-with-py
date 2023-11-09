@@ -4,6 +4,10 @@ rm -fr .venv || true
 
 python=python3
 [ -f ~/opt/cpython/bin/python3.12 ] && python=~/opt/cpython/bin/python3.12
+
+hash -r
+echo python=${python}
+
 $python -m venv .venv
 
 . ./.venv/bin/activate

@@ -2,7 +2,7 @@ import { ExpandableSection } from './components';
 
 export const ReadmeSnippet = () => (
   <ExpandableSection
-    class='hover:text-md m-4 rounded-lg bg-stone-300 p-2 text-left text-sm text-blue-600 ring-1 ring-stone-500'
+    class='hover:text-md m-4 rounded-lg bg-green-50 p-2 text-left text-sm text-blue-800 ring-1 ring-stone-500'
     fallback={<p>Expand Readme snippet ...</p>}
   >
     <p class='mt-4'>
@@ -38,8 +38,8 @@ export const ReadmeSnippet = () => (
         workflows using vite, webpack, etc. in place
       </li>
       <li>
-        <span class='p-1 text-emerald-500'>&pi;</span> expand the (dare I say
-        muddy the waters) conversation about a distributed presentation layer
+        <span class='p-1 text-emerald-500'>&pi;</span> expand (dare I say muddy
+        the waters of) the conversation about a distributed presentation layer
         some more
       </li>
       <li>

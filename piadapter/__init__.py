@@ -22,6 +22,13 @@ class PiAdapter:
         if len(self._cached_pi) < num_digits:
             self._cached_pi = [d for d in pi_digit_generator(num_digits)]
 
+    def histograms_seed_cache(self, nums: list[int]):
+        logging.info(f'PiAdapter.histograms_seed_cache({nums})')
+
+        # seed the cache
+        for num in nums:
+            self.histogram(num)
+
     @cache
     def histogram(self, num_digits: int) -> list[int]:
         def compare(v1: int, v2: int):

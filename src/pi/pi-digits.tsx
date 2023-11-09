@@ -3,7 +3,6 @@ import {
   For,
   createResource,
   createSignal,
-  Resource,
 } from 'solid-js';
 import { Bar } from '../components';
 import { usePiState } from './pi.context';
@@ -67,17 +66,6 @@ export const PiDigitsView: Component = (props) => {
   );
 };
 
-const PiNumDigitsHistogram = (props) => {
-  const values: Resource<HistogramValues> = props.values;
-  return (
-    <div class='mt-2 p-2'>
-      <For each={values()?.items}>
-        {(e, i) => <Bar item={e} values={values} />}
-      </For>
-    </div>
-  );
-};
-
 export const PiDigitsHistogram: Component = (props) => {
   const piState = usePiState();
 
@@ -117,7 +105,12 @@ export const PiDigitsHistogram: Component = (props) => {
           <span class='ml-2'>digits</span>
         </p>
       </div>
-      <PiNumDigitsHistogram values={values} />
+
+      <div class='mt-2 p-2'>
+        <For each={values()?.items}>
+          {(e) => <Bar item={e} values={values} />}
+        </For>
+      </div>
     </div>
   );
 };
