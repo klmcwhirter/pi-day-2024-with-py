@@ -21,6 +21,11 @@
 
 ---
 
+- [CPython 3.21 profilers](https://docs.python.org/3.12/library/profile.html)
+- [Profiling in Python: How to Find Performance Bottlenecks](https://realpython.com/python-profiling/)
+
+---
+
 - [Python + pyscript + WebAssembly: Python Web Apps, Running Locally with pyscript](https://youtu.be/lC2jUeDKv-s?si=bNLn7J5T7SphWdnY)
 
 ---

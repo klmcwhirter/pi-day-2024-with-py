@@ -1,16 +1,9 @@
-import {
-  For,
-  Match,
-  Resource,
-  Show,
-  Suspense,
-  Switch,
-  createSignal,
-} from 'solid-js';
+import { For, Match, Resource, Show, Switch, createSignal } from 'solid-js';
 import { PiDigitsHistogram, PiDigitsView } from './pi/pi-digits';
 import { HistogramItemValues, HistogramValues } from './pi/pi-digits.model';
 import { AppStateEnum } from './App';
 import { ReadmeSnippet } from './ReadmeSnippet';
+import { usePiState } from './pi/pi.context';
 
 export const Bar = (props) => {
   const TOTAL_WIDTH = 32; // in rem
@@ -55,16 +48,16 @@ export const ExpandableSection = (props) => {
 
   const [expanded, setExpanded] = createSignal(expanded_default);
 
-  const toggleExpanded = (evt) => setExpanded((prev) => !prev);
+  const toggleExpanded = (_evt) => setExpanded((prev) => !prev);
 
   return (
     <section
       class={`${classes} hover:cursor-pointer hover:font-semibold`}
       onclick={toggleExpanded}
     >
-      <Show when={!expanded()}>{fallback}</Show>
-
-      <Show when={expanded()}>{props.children}</Show>
+      <Show when={expanded()} fallback={fallback}>
+        {props.children}
+      </Show>
     </section>
   );
 };
@@ -110,16 +103,18 @@ export const Header = (props) => {
 };
 
 export const NavSwitcher = (props) => {
+  const piState = usePiState();
   const [state] = props.state;
 
   return (
     <div class='col-span-2 col-start-2 mx-auto h-[89vh]'>
-      <Suspense
+      <Show
+        when={piState.seeded()}
         fallback={
           <div class='m-28 rounded-lg bg-stone-300 p-28 text-blue-700 shadow-2xl shadow-blue-900'>
             <p class='text-6xl'>Loading lots of &pi; ...</p>
             <p class='mt-10 text-2xl text-green-600'>
-              the server can be shut down now
+              but the server can be shut down now
             </p>
             <p class='mt-10 text-4xl text-purple-700'>
               do examine the console.log !
@@ -138,12 +133,13 @@ export const NavSwitcher = (props) => {
             <PiDigitsHistogram />
           </Match>
         </Switch>
-      </Suspense>
+      </Show>
     </div>
   );
 };
 
 export const NavView = (props) => {
+  const piState = usePiState();
   const [state, setState] = props.state;
   const appStates = [AppStateEnum.DIGITS, AppStateEnum.HISTOGRAM];
 
@@ -153,9 +149,11 @@ export const NavView = (props) => {
         <For each={appStates}>
           {(s) => (
             <li class='p-2'>
-              <a
-                class='m-2 block p-2 text-lg text-blue-700
-                hover:cursor-pointer hover:rounded-lg hover:bg-emerald-700 hover:font-bold hover:text-white'
+              <button
+                disabled={!piState.seeded()}
+                class='hover:disabled::cursor-auto m-2 block p-2 text-lg text-blue-700
+                hover:cursor-pointer hover:rounded-lg hover:bg-emerald-700 hover:font-bold
+                hover:text-white disabled:rounded-lg disabled:bg-stone-300 disabled:text-stone-700'
                 classList={{
                   'rounded-lg bg-emerald-500 font-bold text-white shadow-xl':
                     state() === s,
@@ -163,7 +161,7 @@ export const NavView = (props) => {
                 onclick={() => setState(s)}
               >
                 {s}
-              </a>
+              </button>
             </li>
           )}
         </For>

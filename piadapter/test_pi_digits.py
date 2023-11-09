@@ -31,11 +31,10 @@ def test_pi_digit_generator_first_10():
             100000,  # times out
             [9999, 10137, 9908, 10026, 9971, 10026, 10028, 10025, 9978, 9902],
             marks=[pytest.mark.slow, pytest.mark.skip(reason=f'times out at MAX_SECS={MAX_SECS}')]),
-        pytest.param(50000, [], marks=[
-                     pytest.mark.slow, pytest.mark.skip(reason=f'times out at MAX_SECS={MAX_SECS}')]),
+        pytest.param(50000, [5033, 5054, 4867, 4948, 5011, 5052, 5018, 4977, 5030, 5010], marks=[pytest.mark.slow]),
         pytest.param(40000, [3989, 4060, 3892, 3972, 4014, 4040, 4026, 3977, 4032, 3998], marks=[pytest.mark.slow]),
         pytest.param(30000, [2998, 3048, 2897, 2979, 3057, 3049, 3012, 2974, 2972, 3014], marks=[pytest.mark.slow]),
-        [25000, [2476, 2519, 2403, 2492, 2549, 2567, 2541, 2479, 2465, 2509]],
+        pytest.param(25000, [2476, 2519, 2403, 2492, 2549, 2567, 2541, 2479, 2465, 2509], marks=[pytest.mark.slow]),
         [20000, [1954, 1997, 1986, 1987, 2043, 2082, 2017, 1953, 1961, 2020]],
         [10000, [968, 1026, 1021, 975, 1012, 1046, 1021, 970, 947, 1014]],
         [1024, [96, 117, 106, 105, 94, 101, 96, 97, 105, 107]],
@@ -48,7 +47,7 @@ def test_histogram_n_digits(adapter: PiAdapter, n: int, expected: list[int]):
     try:
         with time_limit(MAX_SECS):
             rc = adapter.histogram(n)
-    except TimeoutException as e:
+    except TimeoutException:
         pytest.fail(f'adapter.histogram(num_digits={n}) timed out at MAX_SECS={MAX_SECS} seconds', pytrace=False)
 
     assert expected == rc
@@ -58,51 +57,55 @@ collected: dict[int, list[int]] = {}
 
 
 def collect_histogram_for_n_digits(n: int):
-    adapter = PiAdapter()
+    adapter = PiAdapter()  # fresh adapter each time - no caching on purpose
     rc = adapter.histogram(n)
     collected[n] = rc
     return rc
 
 
-@pytest.mark.slow
-def test_histogram_perf():
+@pytest.mark.parametrize(
+    ['n', 'expected_secs'],
+    [
+        pytest.param(
+            100000,  0,
+            marks=[pytest.mark.slow, pytest.mark.skip(reason=f'times out at MAX_SECS={MAX_SECS}')]),
+        pytest.param(50000, 24.5, marks=[pytest.mark.slow]),
+        pytest.param(40000, 15.03, marks=[pytest.mark.slow]),
+        pytest.param(30000, 8.5, marks=[pytest.mark.slow]),
+        pytest.param(25000, 5.75, marks=[pytest.mark.slow]),
+        [20000, 3.75],
+        [10000, 1.5],
+        [1024, 0.105],
+        [1000, 0.100],
+        [100, 0.001],
+        [10, 0.0001],
+        [-1, 0]  # sentinel to produce output
+    ]
+)
+def test_histogram_perf(n: int, expected_secs: float):
     '''Time the execution for succeeding larger orders of magnitude (10^n) and stop when larger than 10 secs'''
-    print(f'\nRunning with MAX_SECS={MAX_SECS}')
+    # print(f'\nRunning with MAX_SECS={MAX_SECS}')
 
-    expected_secs = {
-        10: 0.001,
-        100: 0.003,
-        1000: 0.125,
-        1024: 0.128,
-        10000: 1.737,
-    }
-
-    done = False
-    n = 10
-    while not done:
+    if n > 0:
         stmt = f'collect_histogram_for_n_digits({n})'
-        print(f'Executing {stmt}')
+        # print(f'Executing {stmt}')
 
         secs = 0
         try:
             with time_limit(MAX_SECS):
                 secs = timeit.timeit(stmt=stmt, number=1, globals=globals())
-        except TimeoutException as e:
+        except TimeoutException:
             print(f'n={n} timed out')
-            break
+            raise
 
-        print(f'n={n} ran in {secs: .4F} secs, expected_secs={expected_secs[n]}')
+        msg = f'n={n} ran in {secs: .4F} secs, expected_secs={expected_secs}'
+        print(msg)
 
-        assert expected_secs[n] >= secs
+        assert expected_secs >= secs, msg
 
-        if n == 1000:
-            n = 1024
-        elif n == 1024:
-            n = 10_000
-        else:
-            n = n * 10  # increase order of magnitude
-
-    for n, histogram in collected.items():
-        max_n = histogram.index(max(histogram))
-        min_n = histogram.index(min(histogram))
-        print(f'{n}: min={min_n}, max={max_n}, histogram={histogram}')
+    if n < 0:
+        print('\n')
+        for n, histogram in collected.items():
+            max_n = histogram.index(max(histogram))
+            min_n = histogram.index(min(histogram))
+            print(f'{n}: min={min_n}, max={max_n}, histogram={histogram}')

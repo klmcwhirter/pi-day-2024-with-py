@@ -3,10 +3,20 @@ import { loadPyodide, PyProxy } from '/node_modules/pyodide/pyodide.mjs';
 let pyodide;
 
 export class PiAdapter {
-  constructor(public piaProxy: PyProxy) {
+  constructor(
+    public piaProxy: PyProxy,
+    public seeded: boolean = false,
+    public seeding: boolean = false,
+  ) {
+    this.piaProxy = piaProxy;
+    this.seeded = seeded;
+    this.seeding = seeding;
+
     // Provide default implementation while loading
     if (!this.piaProxy) {
       this.piaProxy = {
+        mock: true,
+        histograms_seed_cache(nums: number[]): void {},
         histogram: (num_digits: number): number[] => {
           return [];
         },
@@ -20,9 +30,53 @@ export class PiAdapter {
     this.piaProxy?.destroy();
   }
 
+  histograms_seed_cache(nums: number[], force = false): void {
+    console.log(`JS: histograms_seed_cache([${nums}], force=${force})`);
+    if (this.piaProxy?.mock) {
+      console.log(
+        `JS: histograms_seed_cache([${nums}], force=${force}) - no piaProxy yet ... skipping`,
+      );
+      return;
+    }
+
+    if (this.seeding && !force) {
+      console.log(
+        `JS: histograms_seed_cache([${nums}], force=${force}) - already seeding cache ... skipping`,
+      );
+      return;
+    }
+
+    this.seeded = false;
+    console.log(
+      `JS: histograms_seed_cache([${nums}], force=${force}) - not seeding cache ... continuing`,
+    );
+
+    this.piaProxy?.histograms_seed_cache(nums);
+
+    console.log(
+      `JS: histograms_seed_cache([${nums}], force=${force}) ... done`,
+    );
+
+    this.seeded = true;
+    this.seeding = false;
+  }
+
   histogram(num_digits: number): number[] {
+    let rc = [];
     console.log(`JS: histogram(${num_digits})`);
-    const rc = this.piaProxy?.histogram(num_digits) || [];
+    if (this.piaProxy?.mock) {
+      console.log(
+        `JS: histogram(${num_digits}) -  - no piaProxy yet ... skipping`,
+      );
+    }
+
+    if (!this.seeded || this.seeding) {
+      console.log(
+        `JS: histogram(${num_digits}) - cache not seeded or currently seeding - skipping`,
+      );
+    } else {
+      rc = this.piaProxy?.histogram(num_digits) || [];
+    }
     return rc;
   }
 
@@ -60,16 +114,9 @@ export const loadPython = async (_load: boolean): Promise<PiAdapter> => {
 
   const piAdapter = new PiAdapter(pia);
 
-  console.log('JS: version=', piAdapter.version());
   console.log(
-    'JS: The server can be shutdown now. Everything is running here.',
+    'JS: The server can be shutdown now. Everything is running in the browser.',
   );
-
-  // seed the cache
-  for (const n of WELL_KNOWN_NUMS.toReversed()) {
-    // optimize caching of digits via toReversed above
-    piAdapter.histogram(n);
-  }
 
   return piAdapter;
 };
