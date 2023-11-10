@@ -101,46 +101,46 @@ Here is what I did to improve the loading time.
 
 - #### Profile my code
 
-  CPython 3.12 has some really interesting integrations with the perf utility on Linux.
-  I used the following references to get prepared to use them.
+CPython 3.12 has some really interesting integrations with the perf utility on Linux.
+I used the following references to get prepared to use them.
 
-  - [CPython 3.12 profilers](https://docs.python.org/3.12/library/profile.html)
-  - [Profiling in Python: How to Find Performance Bottlenecks](https://realpython.com/python-profiling/)
+- [CPython 3.12 profilers](https://docs.python.org/3.12/library/profile.html)
+- [Profiling in Python: How to Find Performance Bottlenecks](https://realpython.com/python-profiling/)
 
-  _See [./piadapter/profile_pi.py](./piadapter/profile_pi.py)._
+_See [./piadapter/profile_pi.py](./piadapter/profile_pi.py)._
 
-  In short, what I found is that the complexity of the pi_digit_generator algorithm matters in terms of the number of operations performed.
+In short, what I found is that the complexity of the pi_digit_generator algorithm matters in terms of the number of operations performed.
 
-  And remember Python in pyodide runs ~50% slower than in my locally compiled 3.12 instance of CPython. So any improvement (or degradation for that matter) will be magnified.
+And remember Python in pyodide runs ~50% slower than in my locally compiled 3.12 instance of CPython. So any improvement (or degradation for that matter) will be magnified.
 
 - #### Select better algorithm and write tests
 
-  After searching for various algorithms out in the wild and comparing them against each other by writing tests, I settled on one that seems to be the fastest and is reliable. _Like everything else on the web, there are a lot of bad pi algorithms._
+After searching for various algorithms out in the wild and comparing them against each other by writing tests, I settled on one that seems to be the fastest and is reliable. _Like everything else on the web, there are a lot of bad pi algorithms._
 
-  _See [./piadapter/pi_digits.py](./piadapter/pi_digits.py)._
+_See [./piadapter/pi_digits.py](./piadapter/pi_digits.py)._
 
-  I wrote tests to be sure the execution times were reasonable and the histograms were consistent with my original algorithm.
+I wrote tests to be sure the execution times were reasonable and the histograms were consistent with my original algorithm.
 
-  _See [./piadapter/test_pi_digits.py](./piadapter/test_pi_digits.py)._
+_See [./piadapter/test_pi_digits.py](./piadapter/test_pi_digits.py)._
 
 - #### Improve memoization strategy
 
-  Because pi_digit_generator is expected to be idempotent given some upper bound N num_digit value, I found it valuable to cache the output from just the upper bound. Any lower value of num_digits will share the same first set of digits.
+Because pi_digit_generator is expected to be idempotent given some upper bound N num_digit value, I found it valuable to cache the output from just the upper bound. Any lower value of num_digits will share the same first set of digits.
 
-  Also, histograms consist of a list of 10 integers. So carefully placed usage of the [functools.cache decorator](https://docs.python.org/3/library/functools.html#functools.cache) means I can greatly improve perceived performance for values of num_digits especially >=10_000.
+Also, histograms consist of a list of 10 integers. So carefully placed usage of the [functools.cache decorator](https://docs.python.org/3/library/functools.html#functools.cache) means I can greatly improve perceived performance for values of num_digits especially >=10_000.
 
-  _See [histogram in piadapter](./piadapter/__init__.py) ..._
+_See [histogram in piadapter](./piadapter/__init__.py) ..._
 
-  ```python
-    @cache
-    def histogram(self, num_digits: int) -> list[int]:
-        ...
-  ```
+```python
+  @cache
+  def histogram(self, num_digits: int) -> list[int]:
+      ...
+```
 
-  - minimize the perceived performance of the generator by reusing result from the largest num_digits value (30_000) - check - :white_check_mark:
-  - minimize the perceived performance of calculating the histograms by memoizing the results - check - :white_check_mark:
+- minimize the perceived performance of the generator by reusing result from the largest num_digits value (30_000) - :white_check_mark:
+- minimize the perceived performance of calculating the histograms by memoizing the results - :white_check_mark:
 
-  Then I just arrange for all the histograms to be calculated in descending order during that dreaded loading phase. But it is now ~10 secs instead of >70 secs!
+Then I just arrange for all the histograms to be calculated in descending order during that dreaded loading phase. But it is now ~10 secs instead of >70 secs!
 
 ### Downsides - Build / Deployment
 
