@@ -13,7 +13,7 @@
 
 ## Overview
 
-In spirit, this is just a reimplementation of [pi-day-2021-with-py](https://github.com/klmcwhirter/pi-day-2021-with-py). But it is, oh, so more than that.
+In spirit, this is just a reimplementation of [pi-day-2021-with-py](https://github.com/klmcwhirter/pi-day-2021-with-py). But it is, oh, so much more than that.
 
 It uses [SolidJS](https://www.solidjs.com/) and [pyodide](https://pyodide.org/), and runs completely in the browser.
 
@@ -40,9 +40,9 @@ It may not seem earth shattering, but I am blown away.
 
 The Python code in the WASM component can do:
 
-- data crunching (data science libraries e.g., numpy, pandas, etc. come built into pyodide) - even though I am not using them on purpose
+- data crunching (data science libraries e.g., numpy, pandas, etc. come built into pyodide) - even though I am not using them on purpose, and not much can be done really - see [Downsides](#downsides) below
 - make API calls
-- use Python skilled resources on the team where it make sense to do so
+- use Python skilled resources on the team more where it make sense to do so
 - leverage the more expressive nature of Python vs JavaScript to get the job done in a more maintainable way
 - keep the very mature UI workflows using vite, webpack, etc. in place
 - expand (dare I say muddy the waters of) the conversation about a distributed presentation layer some more
@@ -57,13 +57,13 @@ After all, pi day is about celebrating PI vs TAU (from a mathematical perspectiv
 
 ## Run it
 
-The build and deployment relies on Docker and docker-compose. But those are the only dependencies (aside from an internet connection).
+The build and deployment process relies on Docker and docker-compose. But those are the only dependencies (aside from an internet connection).
 
 Just run `docker-compose up` and open [http://localhost:9000/](http://localhost:9000/) in a browser.
 
 Hit CTRl-C twice! in the terminal where `docker-compose up` was executed to exit.
 
-Yes, twice.
+Yes, I did say twice.
 
 <a name="#why-pyodide" />
 
