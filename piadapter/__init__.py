@@ -36,15 +36,15 @@ class PiAdapter:
 
         self._cache_pi_digits(num_digits)
 
-        counter = {}
+        rc: list[int] = []
 
+        # leverage the fact that pi_digit_generator is idempotent for some max num_digits value
+        # the first num_digits of pi will be the same for any num_digits value up to and including num_digits
         digits = [n for n in self._cached_pi[:num_digits]]
 
         for d in range(10):
             compare_d = partial(compare, v2=d)
-            counter[d] = len([v for v in filter(compare_d, digits)])
-
-        rc = [counter[k] for k in range(10)]
+            rc.append(len([v for v in filter(compare_d, digits)]))
 
         from pprint import pformat
         logging.info(f'PiAdapter.histogram({num_digits}): {pformat(rc)}')
@@ -56,6 +56,8 @@ class PiAdapter:
         logging.info(f'PiAdapter.pi_digits({num_digits}, {n})')
         self._cache_pi_digits(num_digits)
 
+        # leverage the fact that pi_digit_generator is idempotent for some max num_digits value
+        # the first num_digits of pi will be the same for any num_digits value up to and including num_digits
         return [da for da in batched([int(digit) for digit in self._cached_pi[:num_digits]], n)]
 
     def version(self):
