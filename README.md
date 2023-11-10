@@ -127,29 +127,31 @@ Here is what I did to improve the loading time.
 
   Because pi_digit_generator is expected to be idempotent given some upper bound N num_digit value, I found it valuable to cache the output from just the upper bound. Any lower value of num_digits will share the same first set of digits.
 
-  Also, histograms consist of a list of 10 integers. So carefully placed usage of the functools.cache decorator means I can greatly improve perceived performance for values of num_digits especially >=10_000.
+  Also, histograms consist of a list of 10 integers. So carefully placed usage of the [functools.cache decorator](https://docs.python.org/3/library/functools.html#functools.cache) means I can greatly improve perceived performance for values of num_digits especially >=10_000.
 
-  ```python
-      @cache
-      def histogram(self, num_digits: int) -> list[int]:
-          ...
-  ```
+_See [histogram in piadapter](./piadapter/__init__.py) ..._
 
-  - minimize the perceived performance of the generator by reusing result from the largest num_digits value (30_000) - check
-  - minimize the perceived performance of calculating the histograms by memoizing the results - check
+```python
+    @cache
+    def histogram(self, num_digits: int) -> list[int]:
+        ...
+```
 
-  Then I just arrange for all the histograms to be calculated in descending order during that dreaded loading phase. But it is now ~10 secs instead of >30 secs!
+- minimize the perceived performance of the generator by reusing result from the largest num_digits value (30_000) - check - :white_check_mark:
+- minimize the perceived performance of calculating the histograms by memoizing the results - check - :white_check_mark:
+
+Then I just arrange for all the histograms to be calculated in descending order during that dreaded loading phase. But it is now ~10 secs instead of >70 secs!
 
 ### Downsides - Build / Deployment
 
-I could not get pyodide to fully coexist with my vite build system. I suspect, primarily, because of all of the dynamically loaded dependencies. I did see mentions of different groups of people working on that. But the main focus right now is HTML with vanilla JS. And I think that is smart.
+I could not get pyodide to fully coexist with my vite build system. I suspect, primarily, because of all of the dynamically loaded dependencies. I did see mentions of different groups of people working on that. But the main focus right now is HTML with vanilla JS. And I think that is smart. _Get the core working first._
 
-_Get the core working first._
-
-Also, even though I am targeting the browser execution model, it seems to drag in nodejs modules for various things during the build process. Huh?
+Also, even though I am targeting the browser execution model, it seems to drag in nodejs modules for various things during the build process. _Huh?_
 
 I spent just a few hours looking for low hanging fruit but then decided to just use vite's built in dev server instead.
 
 The time needed to solve the CI/CD problem set is just not worth it for this silly little experiment of mine.
 
-Maybe in a year or two I will revisit it. Who knows. By then pyodide should be much more stable.
+Maybe in a year or two I will revisit it. Who knows. By then pyodide should be much more mature and stable.
+
+And more importantly, maybe someone else will have solved it for me.
