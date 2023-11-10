@@ -129,22 +129,22 @@ Here is what I did to improve the loading time.
 
   Also, histograms consist of a list of 10 integers. So carefully placed usage of the [functools.cache decorator](https://docs.python.org/3/library/functools.html#functools.cache) means I can greatly improve perceived performance for values of num_digits especially >=10_000.
 
-_See [histogram in piadapter](./piadapter/__init__.py) ..._
+  _See [histogram in piadapter](./piadapter/__init__.py) ..._
 
-```python
+  ```python
     @cache
     def histogram(self, num_digits: int) -> list[int]:
         ...
-```
+  ```
 
-- minimize the perceived performance of the generator by reusing result from the largest num_digits value (30_000) - check - :white_check_mark:
-- minimize the perceived performance of calculating the histograms by memoizing the results - check - :white_check_mark:
+  - minimize the perceived performance of the generator by reusing result from the largest num_digits value (30_000) - check - :white_check_mark:
+  - minimize the perceived performance of calculating the histograms by memoizing the results - check - :white_check_mark:
 
-Then I just arrange for all the histograms to be calculated in descending order during that dreaded loading phase. But it is now ~10 secs instead of >70 secs!
+  Then I just arrange for all the histograms to be calculated in descending order during that dreaded loading phase. But it is now ~10 secs instead of >70 secs!
 
 ### Downsides - Build / Deployment
 
-I could not get pyodide to fully coexist with my vite build system. I suspect, primarily, because of all of the dynamically loaded dependencies. I did see mentions of different groups of people working on that. But the main focus right now is HTML with vanilla JS. And I think that is smart. _Get the core working first._
+I could not get pyodide to fully coexist with my vite build system. I suspect, primarily, because of all of the dependencies pyodide loads dynamically at runtime. I did see mentions of different groups of people working on that. But the main focus right now is HTML with vanilla JS. And I think that is smart. _Get the core working first._ I am sure that guiding principle is part of the reason why I was able to get this working in such short order.
 
 Also, even though I am targeting the browser execution model, it seems to drag in nodejs modules for various things during the build process. _Huh?_
 
