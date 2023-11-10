@@ -137,8 +137,8 @@ _See [histogram in piadapter](./piadapter/__init__.py) ..._
       ...
 ```
 
-- minimize the perceived performance of the generator by reusing result from the largest num_digits value (30_000) - :white_check_mark:
-- minimize the perceived performance of calculating the histograms by memoizing the results - :white_check_mark:
+- maximize the perceived performance of the generator by reusing result from the largest num_digits value (30_000) - :white_check_mark:
+- maximize the perceived performance of calculating the histograms by memoizing the results - :white_check_mark:
 
 Then I just arrange for all the histograms to be calculated in descending order during that dreaded loading phase. But it is now ~10 secs instead of >70 secs!
 
