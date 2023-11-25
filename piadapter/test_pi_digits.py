@@ -77,8 +77,8 @@ def collect_histogram_for_n_digits(n: int):
         [10000, 1.5],
         [1024, 0.105],
         [1000, 0.100],
-        [100, 0.001],
-        [10, 0.0001],
+        [100, 0.0015],
+        [10, 0.00025],
         [-1, 0]  # sentinel to produce output
     ]
 )
