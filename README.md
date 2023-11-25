@@ -5,12 +5,10 @@
 - [Overview](#overview)
 - [Run it](#run-it)
 - [Why pyodide?](#why-pyodide)
-- [Downsides](./docs/wasm-downsides)
+- [Downsides](./docs/wasm-downsides.md)
 - [Summary](#summary)
 
 ---
-
-<a name="#overview" />
 
 ## Overview
 
@@ -35,8 +33,6 @@ There are 3 main features represented by the screenshots below.
 >
 > But it was fun to build and shows something else that is possible with WASM.
 
-<a name="#run-it" />
-
 ## Run it
 
 The build and deployment process relies on Docker and docker-compose. But those are the only dependencies (aside from an internet connection).
@@ -46,8 +42,6 @@ Just run `docker-compose up` and open [http://localhost:9000/](http://localhost:
 Hit CTRl-C twice! in the terminal where `docker-compose up` was executed to exit.
 
 Yes, I did say twice.
-
-<a name="#why-pyodide" />
 
 ## Why pyodide?
 
@@ -63,8 +57,6 @@ I did take a cursory look at a few other things like iodide (that also uses pyod
 
 Nothing I found was as ready to use as pyodide - search stopped there for now.
 
-<a name="#summary" />
-
 ## Summary
 
 I do think this pattern has promise, but not just yet. It is a little too early. If you notice the version numbers of some of the tech involved are not at version 1.0 yet. And there is a lot of integrated tech involved! Many people across many projects have contributed to what you see here.
@@ -73,7 +65,7 @@ The result may not seem earth shattering on the surface, but I am blown away.
 
 The Python code in the WASM component can do:
 
-- data crunching (data science libraries e.g., numpy, pandas, etc. come built into pyodide) - even though I am not using them on purpose, and not much can be done really - see [Downsides](./docs/wasm-downsides)
+- data crunching (data science libraries e.g., numpy, pandas, etc. come built into pyodide) - even though I am not using them on purpose, and not much can be done really - see [Downsides](./docs/wasm-downsides.md)
 - make API calls
 - use Python skilled resources on the team more where it make sense to do so
 - leverage the more expressive nature of Python vs JavaScript to get the job done in a more maintainable way
@@ -88,5 +80,5 @@ After all, pi day is about celebrating PI vs TAU (from a mathematical perspectiv
 
 ## Notes
 
-- [References](./docs/references)
+- [References](./docs/references.md)
 
