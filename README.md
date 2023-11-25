@@ -51,7 +51,7 @@ takes almost complete control of the loaded DOM.
 
 _FYI, [iodide](https://github.com/iodide-project/iodide) is another interesting project, but sadly it is no longer under development._
 
-And, it uses pyodide internally to accomplish its goals.
+And, both PyScript and iodide use pyodide internally to accomplish their goals.
 
 I did take a cursory look at a few other things like iodide (that also uses pyodide) and the WASM/WASI tooling being built into cpython itself.
 
