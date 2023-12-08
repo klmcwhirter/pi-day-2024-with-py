@@ -16,7 +16,7 @@
             ];
 	    shellHook = ''
 	      echo -e "execute:\n\tdocker-compose up\n"
-	      echo -e "start tunnel on host:\n\tssh -L 9000:localhost:9000 nixos sleep 30\n"
+	      echo -e "start tunnel to host:\n\tssh -L 9000:localhost:9000 nixos sleep 30\n"
 	      echo -e "visit browser at:\n\thttp://localhost:9000/\n"
 	    '';
         };
