@@ -43,7 +43,7 @@ Hit CTRl-C twice! in the terminal where `docker-compose up` was executed to exit
 
 Yes, I did say twice.
 
-If you are uing the nix package manager with flakes enabled, then simply doiung the following will setup the environment and output a reminder of next steps.
+If you are uing the nix package manager with flakes enabled, then simply doing the following will setup the environment and output a reminder of next steps.
 
 `$ nix develop`
 
