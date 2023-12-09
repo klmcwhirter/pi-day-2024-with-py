@@ -151,11 +151,11 @@ export const NavView = (props) => {
             <li class='p-2'>
               <button
                 disabled={!piState.seeded()}
-                class='hover:disabled::cursor-auto m-2 block p-2 text-lg text-blue-700
+                class='hover:disabled::cursor-auto m-2 block p-2 rounded-lg bg-emerald-50 text-lg text-blue-700
                 hover:cursor-pointer hover:rounded-lg hover:bg-emerald-700 hover:font-bold
                 hover:text-white disabled:rounded-lg disabled:bg-stone-300 disabled:text-stone-700'
                 classList={{
-                  'rounded-lg bg-emerald-500 font-bold text-white shadow-xl':
+                  'bg-emerald-500 font-bold text-white shadow-xl':
                     state() === s,
                 }}
                 onclick={() => setState(s)}
