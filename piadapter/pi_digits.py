@@ -8,6 +8,8 @@ def pi_digit_generator(num_digits: int) -> Generator[int, None, None]:
     '''
     This algorithm is based on an unproven conjecture but successfully produces at least the first 1 million digits.
     Read more about it here: https://www.gavalas.dev/blog/spigot-algorithms-for-pi-in-python/
+
+    And here - Gosper's series: https://www.gavalas.dev/blog/spigot-algorithms-for-pi-in-python/#the-open-problem
     '''
     logging.info(f'pi_digit_generator(num_digits={num_digits})')
 
