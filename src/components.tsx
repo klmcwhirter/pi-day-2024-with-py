@@ -12,9 +12,7 @@ export const Bar = (props) => {
   const values: Resource<HistogramValues> = props.values;
 
   const width = `${TOTAL_WIDTH * values().ratio(item.value * 2)}rem`;
-  const rest = `${
-    TOTAL_WIDTH - TOTAL_WIDTH * values().ratio(item.value * 2)
-  }rem`;
+  const rest = `${TOTAL_WIDTH - TOTAL_WIDTH * values().ratio(item.value * 2)}rem`;
 
   return (
     <div class={`mb-6 bg-stone-200 text-left shadow-lg ${item.shadow}`}>
