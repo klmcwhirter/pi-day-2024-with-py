@@ -20,6 +20,7 @@ def pi_digit_generator(num_digits: int) -> Generator[int, None, None]:
         q, r, t, i = 10*q*i*(2*i-1), 10*u*(q*(5*i-2)+r-y*t), t*u, i+1
         num_digits -= 1
 
+# region
 
 # def pi_digit_generator_orig(num_digits: int) -> Generator[int, None, None]:
 #     '''Generate num_digits digits of Pi
@@ -42,3 +43,25 @@ def pi_digit_generator(num_digits: int) -> Generator[int, None, None]:
 #             num_digits -= 1
 #             a, a1 = 10*(a % b), 10*(a1 % b1)
 #             d, d1 = a/b, a1/b1
+
+# endregion
+
+
+if __name__ == '__main__':
+    import sys
+
+    if len(sys.argv) < 2:
+        print('Usage: python -m piadapter.pi_digits filename.py')
+        sys.exit(1)
+
+    logging.info(f'Start writing to sys.argv[1]...')
+
+    with open(sys.argv[1], 'w') as f:
+        __digits = [d for d in pi_digit_generator(30_000)]
+        print("'''Automatically generated via python -m piadapter.pi_digits piadapter/pi_30000.py'''", file=f)
+        print('# region', file=f)
+        print('pi_digits_30000 = ', end='', file=f)
+        print(__digits, file=f)
+        print('# endregion', file=f)
+
+    logging.info(f'Done writing to sys.argv[1].')

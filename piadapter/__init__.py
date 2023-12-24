@@ -5,6 +5,7 @@ import os
 import sys
 from functools import cache, partial
 
+from piadapter.pi_30000 import pi_digits_30000
 from piadapter.pi_digits import pi_digit_generator
 from piadapter.utils import batched
 
@@ -13,7 +14,7 @@ logging.basicConfig(level=logging.DEBUG, format='PYTHON: {asctime} - {module} - 
 
 class PiAdapter:
     def __init__(self) -> None:
-        self._cached_pi: list[int] = []
+        self._cached_pi: list[int] = pi_digits_30000
 
     def __repr__(self) -> str:
         return 'PiAdapter()'
