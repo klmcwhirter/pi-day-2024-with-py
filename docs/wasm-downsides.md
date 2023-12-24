@@ -53,11 +53,18 @@ _See [histogram in piadapter](../piadapter/__init__.py) ..._
 - maximize the perceived performance of the generator by reusing result from the largest num_digits value (30_000) - :white_check_mark:
 - maximize the perceived performance of calculating the histograms by memoizing the results - :white_check_mark:
 
-Then I just arrange for all the histograms to be calculated in descending order during that dreaded loading phase. But it is now ~10 secs instead of >70 secs!
+Then I just arrange for all the histograms to be calculated in descending order during that dreaded loading phase. But with better memoization it takes just ~10 secs instead of >70 secs!
+
+- #### Wrote tool to generate the dictionary of digits
+After that success I wrote a tool as part of the [../piadapter/pi_digits.py](../piadapter/pi_digits.py) module that will exercise the generator for 30_000 digits of pi and store the result in a file - [../piadapter/pi_30000.py](../piadapter/pi_30000.py).
+
+I then use that to seed the cache in the PiAdpater init method. _See [PiAdapter init](../piadapter/__init__.py) ..._
+
+That reduces start up time to just a couple of seconds.
 
 ### Downsides - Build / Deployment
 
-I could not get pyodide to fully coexist with my vite build system. I suspect, primarily, because of all of the dependencies pyodide loads dynamically at runtime. I did see mentions of different groups of people working on that. But the main focus right now is HTML with vanilla JS. And I think that is smart. _Get the core working first._ I am sure that guiding principle is part of the reason why I was able to get this working in such short order.
+I could not get pyodide to fully coexist with my vite build system. I suspect, primarily, because of all of the dependencies pyodide loads dynamically at runtime. I did see mentions of different groups of people working on that. But the main focus right now is nodejs and then HTML with vanilla JS. And I think that is smart. _Get the core working first._ I am sure that guiding principle is part of the reason why I was able to get this working in such short order.
 
 Also, even though I am targeting the browser execution model, it seems to drag in nodejs modules for various things during the build process. _Huh?_
 

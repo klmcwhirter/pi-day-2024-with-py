@@ -1,4 +1,5 @@
-import { loadPyodide, PyProxy } from '/node_modules/pyodide/pyodide.mjs';
+import { loadPyodide } from '/node_modules/pyodide/pyodide.mjs';
+import type { PyProxy } from 'pyodide/ffi';
 
 let pyodide;
 
@@ -11,19 +12,6 @@ export class PiAdapter {
     this.piaProxy = piaProxy;
     this.seeded = seeded;
     this.seeding = seeding;
-
-    // Provide default implementation while loading
-    if (!this.piaProxy) {
-      this.piaProxy = {
-        mock: true,
-        histograms_seed_cache(nums: number[]): void {},
-        histogram: (num_digits: number): number[] => {
-          return [];
-        },
-        pi_digits: (num_digits: number, n: number): [number[]] => [[]],
-        version: (): string[] => ['Python is loading ...'],
-      };
-    }
   }
 
   destroy_proxy() {
@@ -32,7 +20,7 @@ export class PiAdapter {
 
   histograms_seed_cache(nums: number[], force = false): void {
     console.log(`JS: histograms_seed_cache([${nums}], force=${force})`);
-    if (this.piaProxy?.mock) {
+    if (this.piaProxy == null) {
       console.log(
         `JS: histograms_seed_cache([${nums}], force=${force}) - no piaProxy yet ... skipping`,
       );
@@ -64,10 +52,11 @@ export class PiAdapter {
   histogram(num_digits: number): number[] {
     let rc = [];
     console.log(`JS: histogram(${num_digits})`);
-    if (this.piaProxy?.mock) {
+    if (this.piaProxy == null) {
       console.log(
         `JS: histogram(${num_digits}) -  - no piaProxy yet ... skipping`,
       );
+      return rc
     }
 
     if (!this.seeded || this.seeding) {
@@ -88,7 +77,7 @@ export class PiAdapter {
 
   version(): string[] {
     console.log('JS: version()');
-    const pyVersions = this.piaProxy?.version() || [];
+    const pyVersions = this.piaProxy?.version() || ['Python is loading...'];
     return [`pyodide.version: ${pyodide?.version}`, ...pyVersions];
   }
 }
