@@ -45,12 +45,11 @@ If you are uing the nix package manager with flakes enabled, then simply doing t
 
 `$ nix develop`
 
+ By the way, yes, podman-compose works as well.
 
 ## Why pyodide?
 
-I started looking at PyScript because it was getting so much press. But, as I found out, it was solving a different problem. They are focusing on
-making it easier for data scientists - only familiar with Python - to get their analysis onto the web. As such it assumes that Python is king and
-takes almost complete control of the loaded DOM.
+I started looking at PyScript because it was getting so much press. But, as I found out, it was solving a different problem. They are focusing on making it easier for data scientists - only familiar with Python - to get their analysis onto the web. As such it assumes that Python is king and takes almost complete control of the loaded DOM.
 
 _FYI, [iodide](https://github.com/iodide-project/iodide) is another interesting project, but sadly it is no longer under development._
 
@@ -79,7 +78,7 @@ The Python code in the WASM component can do:
 
 Here I only pursue client side - because it was fun to do and I was curious.
 
-After all, pi day is about celebrating PI vs TAU (from a mathematical perspective) and, in my case, practicing the skills of my craft.
+After all, pi day is about celebrating PI in any ludracous way imaginable (not just from a mathematical perspective) and, in my case, practicing the skills of my craft.
 
 ## Notes
 

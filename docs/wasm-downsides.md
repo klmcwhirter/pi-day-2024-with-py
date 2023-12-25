@@ -2,6 +2,14 @@
 
 ## Downsides of Python WASM in browser ...
 
+##### Table of Contents
+
+- Performance
+- Build / Deploy
+- Design Choices or Fitness of Purpose
+
+---
+
 ### Downsides - Performance
 
 Because there is only a single accessible thread in the browser, performance will suffer when using this pattern. You are much better off hosting an API in another process and accessing it asynchronously (via fetch, et al). Even cooperative cycle sharing techniques (via features like [requestIdleCallback](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestIdleCallback)) just provide a false sense of hope.
@@ -75,3 +83,27 @@ The time needed to solve the CI/CD problem set is just not worth it for this sil
 Maybe in a year or two I will revisit it. Who knows. By then pyodide should be much more mature and stable.
 
 And more importantly, maybe someone else will have solved it for me.
+
+### Downsides - Design Choices or maybe I just misunderstood fitness of purpose ...
+
+The most widely used (I am not sure it was the first) tool to produce WASM "executables" is the wonderful [emscripten](https://emscripten.org/) tool chain. It uses LLVM internally to target wasm / wasi architectures. In other words, it works just like the compilers / link editors we have been using for decades.
+
+You give it your (example) C / C++ source code, any options and where you want the output to be placed. This gives you at least a .wasm file that can then be loaded into a browser - again, for example.
+
+The Rust tool chain works the same way. You tell it to build, target the wasm architecture, give it your custom options and voila - a wasm file is produced.
+
+Pyodide (and tools that wrap it like PyScript) don't work like that.
+
+Pyodide *is* the WASM component. The Python artifacts are loaded and interpreted by Pyodide at runtime. Because of the dynamic nature of the Python language, and the complex ways its features might be used it just is not practical (yet) to produce a self-contained WASM executable that is small enough to run in a browser.
+
+So Pyodide then, is a project to compile the CPython code base and many libraries using emscripten to produce a wasm to host the runtime.
+
+You may notice that the version of Python exposed by Pyodide in this project is 3.11.3 - [screenshot](./pi-day-2024-footer.png). That is incredibly impressive at how current that is!
+
+However, what cannot happen yet is running Python code through a compiler to produce a wasm file that can be integrated in a web app with other WASM components written in perhaps C/C++, Rust or golang. And, unfortunately, that is exactly what I set out to do.
+
+With that said, I had a ton of fun learning about where things are at and how much passion and energy about Web Assembly is being applied across the board.
+
+For example, see this video: [YouTube: WebAssembly Breakthroughs with Timo Stark - 11:34](https://youtu.be/4Ikk-KJo3y4). Imagine WASM / WASI being naturally supported by the OCI spec. Can you picture `docker run my-wasm-component` ? How about OS loaders?
+
+Happy Pi Day! &pi;
