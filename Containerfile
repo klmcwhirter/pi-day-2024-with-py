@@ -8,27 +8,26 @@ WORKDIR /app
 COPY . /app
 
 RUN apk upgrade --no-cache && \
-ENABLE_TESTS=$ENABLE_TESTS ./etc/run_pytests.sh
+apk add --no-cache zip && \
+ENABLE_TESTS=$ENABLE_TESTS ./etc/gen_run_pytests.sh
 
 #*----------------------------------------------------------------------
 #* build
 #*----------------------------------------------------------------------
 
 FROM node:20-alpine as build
+
 RUN apk upgrade --no-cache && \
-apk add --no-cache zip
+apk add --no-cache unzip
 
 # ENV TZ=PST8PDT set in docker-compose.yml
 
 WORKDIR /app
 COPY . /app
-COPY --from=pythontests /app/pythontests.passed .
+COPY --from=pythontests /app/piadapter.zip .
+COPY --from=pythontests /app/pythontests.* .
 
-
-RUN npm install && \
-rm -f piadapter.zip && \
-zip -r piadapter.zip piadapter/ && \
-apk del --no-cache zip
+RUN npm install
 
 ## Until I can work through the pyodide build issues ...
 EXPOSE 3000

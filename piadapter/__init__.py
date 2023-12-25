@@ -5,7 +5,12 @@ import os
 import sys
 from functools import cache, partial
 
-from piadapter.pi_30000 import pi_digits_30000
+try:
+    from piadapter.pi_30000 import pi_digits_30000
+except:
+    # might not have been generated yet ... fallback
+    pi_digits_30000 = []
+
 from piadapter.pi_digits import pi_digit_generator
 from piadapter.utils import batched
 

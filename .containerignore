@@ -1,9 +1,8 @@
 .git/
-__pycache__/
 **/__pycache__/
-.pytest_cache/
 **/.pytest_cache/
 .venv/
+docs/
 node_modules/
-*.md
-*.png
+**/*.md
+**/*.png
