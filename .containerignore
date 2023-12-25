@@ -1,8 +1,10 @@
-.git/
+/.git/
 **/__pycache__/
 **/.pytest_cache/
-.venv/
+/.venv/
+/docker-compose.yml
 docs/
-node_modules/
+/flake*
+/node_modules/
 **/*.md
 **/*.png

@@ -27,7 +27,9 @@ COPY . /app
 COPY --from=pythontests /app/piadapter.zip .
 COPY --from=pythontests /app/pythontests.* .
 
-RUN npm install
+RUN npm install && \
+etc/clean_final.sh && \
+rm -fr etc/
 
 ## Until I can work through the pyodide build issues ...
 EXPOSE 3000

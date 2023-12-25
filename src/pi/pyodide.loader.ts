@@ -83,7 +83,7 @@ export class PiAdapter {
 }
 
 const loadPiadapter = async (pyodide) => {
-  // See package,json where piadapter.zip is created. That is used by Dockerfile.
+  // See etc/gen_run_pytests.sh where piadapter.zip is created. It is called from Containerfile.
   let zipResponse = await fetch('piadapter.zip');
   let zipBinary = await zipResponse.arrayBuffer();
   await pyodide.unpackArchive(zipBinary, 'zip');
