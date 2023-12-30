@@ -4,16 +4,17 @@ export class HistogramItemValues {
     public value: number,
     public color: string,
     public shadow: string,
-  ) {}
+  ) { }
 }
 
 export class HistogramValues {
   _cachedValues: number[];
 
   constructor(
-    public total: number,
+    public num_digits: number,
     public items: HistogramItemValues[],
-  ) {}
+  ) {
+  }
 
   get _values(): number[] {
     if (!this._cachedValues) {
@@ -35,6 +36,6 @@ export class HistogramValues {
   }
 
   ratio(value: number) {
-    return value / this.total;
+    return value / this.num_digits;
   }
 }

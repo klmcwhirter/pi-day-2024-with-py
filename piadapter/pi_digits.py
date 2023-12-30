@@ -51,17 +51,19 @@ if __name__ == '__main__':
     import sys
 
     if len(sys.argv) < 2:
-        print('Usage: python -m piadapter.pi_digits filename.py')
+        print('Usage: python -m piadapter.pi_digits filename.zig')
         sys.exit(1)
 
-    logging.info(f'Start writing to sys.argv[1]...')
+    logging.info('Start generating 30_000 digits of pi ...')
+    __digits = [d for d in pi_digit_generator(30_000)]
+    logging.info('Done generating 30_000 digits of pi')
+
+    logging.info(f'Start writing to {sys.argv[1]}...')
 
     with open(sys.argv[1], 'w') as f:
-        __digits = [d for d in pi_digit_generator(30_000)]
-        print("'''Automatically generated via python -m piadapter.pi_digits piadapter/pi_30000.py'''", file=f)
-        print('# region', file=f)
-        print('pi_digits_30000 = ', end='', file=f)
-        print(__digits, file=f)
-        print('# endregion', file=f)
-
-    logging.info(f'Done writing to sys.argv[1].')
+        print("// Automatically generated via python -m piadapter.pi_digits pi-zig/pi_30000.zig", file=f)
+        print('pub const pi_30000: []u8 = &pi_30000_array;', file=f)
+        print('var pi_30000_array = [_]u8{', end='', file=f)
+        print(', '.join(str(d) for d in __digits), end='', file=f)
+        print('};', file=f)
+    logging.info(f'Done writing to {sys.argv[1]}.')

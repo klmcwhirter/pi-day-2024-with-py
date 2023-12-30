@@ -1,8 +1,8 @@
 #*----------------------------------------------------------------------
-#* pythontests
+#* pythonbuild
 #*----------------------------------------------------------------------
 
-FROM python:3.12-alpine as pythontests
+FROM python:3.12-alpine as pythonbuild
 ARG ENABLE_TESTS
 WORKDIR /app
 COPY . /app
@@ -10,6 +10,23 @@ COPY . /app
 RUN apk upgrade --no-cache && \
 apk add --no-cache zip && \
 ENABLE_TESTS=$ENABLE_TESTS ./etc/gen_run_pytests.sh
+
+#*----------------------------------------------------------------------
+#* zigbuild
+#*----------------------------------------------------------------------
+FROM alpine as zigbuild
+ARG ENABLE_TESTS
+WORKDIR /app
+COPY ./etc /app/etc
+COPY pi-zig /app
+COPY --from=pythonbuild /app/pi-zig/src/pi_30000.zig src/pi_30000.zig
+
+RUN ZIGVER=0.11.0 && ZIGARCH=zig-linux-x86_64-$ZIGVER.tar.xz && ZIGBIN=zig-bin && \
+apk upgrade --no-cache && \
+apk add --no-cache zip && \
+wget -O $ZIGARCH https://ziglang.org/download/$ZIGVER/$ZIGARCH && \
+tar xf $ZIGARCH && \
+ENABLE_TESTS=$ENABLE_TESTS ZIGARCH=$ZIGARCH ZIGBIN=$ZIGBIN ./etc/build_run_zig_tests.sh
 
 #*----------------------------------------------------------------------
 #* build
@@ -24,8 +41,14 @@ apk add --no-cache unzip
 
 WORKDIR /app
 COPY . /app
-COPY --from=pythontests /app/piadapter.zip .
-COPY --from=pythontests /app/pythontests.* .
+COPY --from=zigbuild /app/zig-build* .
+COPY --from=zigbuild /app/zig-tests* .
+# used for integration testing pi-zig.wasm: execute `node public/pi-zig.js` in the container
+COPY --from=zigbuild /app/src/pi-zig.js ./public/pi-zig.js
+COPY --from=zigbuild /app/zig-out/lib/pi-zig.wasm ./public/pi-zig.wasm
+
+COPY --from=pythonbuild /app/piadapter.zip .
+COPY --from=pythonbuild /app/python-tests.* .
 
 RUN npm install && \
 etc/clean_final.sh && \

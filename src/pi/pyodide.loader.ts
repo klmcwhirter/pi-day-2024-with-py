@@ -1,68 +1,60 @@
 import { loadPyodide } from '/node_modules/pyodide/pyodide.mjs';
 import type { PyProxy } from 'pyodide/ffi';
 
+import { loadZigHistograms, loadZigWasm, logJS, wasm_pi_digits } from './zighisto.loader.js';
+
 let pyodide;
 
+
+class HistogramInterop {
+  num_digits
+  histogram
+}
+
 export class PiAdapter {
+  seeded: boolean;
   constructor(
     public piaProxy: PyProxy,
-    public seeded: boolean = false,
-    public seeding: boolean = false,
   ) {
     this.piaProxy = piaProxy;
-    this.seeded = seeded;
-    this.seeding = seeding;
+    this.seeded = false;
   }
 
   destroy_proxy() {
     this.piaProxy?.destroy();
   }
 
-  histograms_seed_cache(nums: number[], force = false): void {
-    console.log(`JS: histograms_seed_cache([${nums}], force=${force})`);
-    if (this.piaProxy == null) {
-      console.log(
-        `JS: histograms_seed_cache([${nums}], force=${force}) - no piaProxy yet ... skipping`,
-      );
-      return;
-    }
+  seed_pi_digits(pi_digits: Int32Array) {
+    this.piaProxy?.seed_pi_digits(pi_digits);
+  }
 
-    if (this.seeding && !force) {
-      console.log(
-        `JS: histograms_seed_cache([${nums}], force=${force}) - already seeding cache ... skipping`,
-      );
+  histograms_seed_cache(histograms: HistogramInterop[], force = false): void {
+    logJS(`histograms_seed_cache([...], force=${force})`);
+    if (this.piaProxy == null) {
+      logJS(`histograms_seed_cache([...], force=${force}) - no piaProxy yet ... skipping`);
       return;
     }
 
     this.seeded = false;
-    console.log(
-      `JS: histograms_seed_cache([${nums}], force=${force}) - not seeding cache ... continuing`,
-    );
+    logJS(`histograms_seed_cache([...], force=${force}) ... continuing`);
 
-    this.piaProxy?.histograms_seed_cache(nums);
+    this.piaProxy?.histograms_seed_cache(histograms);
 
-    console.log(
-      `JS: histograms_seed_cache([${nums}], force=${force}) ... done`,
-    );
+    logJS(`histograms_seed_cache([...], force=${force}) ... done`);
 
     this.seeded = true;
-    this.seeding = false;
   }
 
   histogram(num_digits: number): number[] {
     let rc = [];
-    console.log(`JS: histogram(${num_digits})`);
+    logJS(`histogram(${num_digits})`);
     if (this.piaProxy == null) {
-      console.log(
-        `JS: histogram(${num_digits}) -  - no piaProxy yet ... skipping`,
-      );
+      logJS(`histogram(${num_digits}) -  - no piaProxy yet ... skipping`);
       return rc
     }
 
-    if (!this.seeded || this.seeding) {
-      console.log(
-        `JS: histogram(${num_digits}) - cache not seeded or currently seeding - skipping`,
-      );
+    if (!this.seeded) {
+      logJS(`histogram(${num_digits}) - cache not seeded or currently seeding - skipping`);
     } else {
       rc = this.piaProxy?.histogram(num_digits) || [];
     }
@@ -70,13 +62,13 @@ export class PiAdapter {
   }
 
   pi_digits(num_digits: number, n: number): number[] {
-    console.log(`JS: pi_digits(${num_digits}, ${n})`);
+    logJS(`pi_digits(${num_digits}, ${n})`);
     const rc = this.piaProxy?.pi_digits(num_digits, n) || [];
     return rc;
   }
 
   version(): string[] {
-    console.log('JS: version()');
+    logJS('version()');
     const pyVersions = this.piaProxy?.version() || ['Python is loading...'];
     return [`pyodide.version: ${pyodide?.version}`, ...pyVersions];
   }
@@ -93,19 +85,34 @@ const loadPiadapter = async (pyodide) => {
 };
 
 export const loadPython = async (_load: boolean): Promise<PiAdapter> => {
+  logJS('loading pyodide');
   pyodide = await loadPyodide();
   pyodide.setStderr({ batched: console.log });
   pyodide.setStdout({ batched: console.log });
-  console.log('JS: back from loading pyodide', pyodide);
+  logJS('back from loading pyodide', pyodide);
 
+  logJS('loading piadapter');
   const pia = await loadPiadapter(pyodide);
-  console.log('JS: back from loading piadapter', pia);
+  logJS('back from loading piadapter', pia);
+
+  logJS('loading zig WASM ...');
+  await loadZigWasm();
+  logJS('loading zig WASM ... done');
 
   const piAdapter = new PiAdapter(pia);
+  piAdapter.seed_pi_digits(wasm_pi_digits);
 
-  console.log(
-    'JS: The server can be shutdown now. Everything is running in the browser.',
-  );
+  logJS('loading histograms');
+
+  const histograms: HistogramInterop[] = await loadZigHistograms(WELL_KNOWN_NUMS);
+
+  logJS('back from loading histograms');
+
+  piAdapter.histograms_seed_cache(histograms);
+
+  logJS('histogram cache seeded');
+
+  logJS('The server can be shutdown now. Everything is running in the browser.');
 
   return piAdapter;
 };

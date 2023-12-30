@@ -3,23 +3,24 @@
 import logging
 import os
 import sys
-from functools import cache, partial
-
-try:
-    from piadapter.pi_30000 import pi_digits_30000
-except:
-    # might not have been generated yet ... fallback
-    pi_digits_30000 = []
+from dataclasses import dataclass
 
 from piadapter.pi_digits import pi_digit_generator
 from piadapter.utils import batched
+
+
+@dataclass
+class HistogramInterop:
+    num_digits: int
+    histogram: list[int]
+
 
 logging.basicConfig(level=logging.DEBUG, format='PYTHON: {asctime} - {module} - {funcName} - {levelname} - {message}', style='{')
 
 
 class PiAdapter:
     def __init__(self) -> None:
-        self._cached_pi: list[int] = pi_digits_30000
+        self._cached_pi: list[int] = []
 
     def __repr__(self) -> str:
         return 'PiAdapter()'
@@ -28,33 +29,20 @@ class PiAdapter:
         if len(self._cached_pi) < num_digits:
             self._cached_pi = [d for d in pi_digit_generator(num_digits)]
 
-    def histograms_seed_cache(self, nums: list[int]):
-        logging.info(f'PiAdapter.histograms_seed_cache({nums})')
+    def seed_pi_digits(self, pi_30000: list[int]):
+        self._cached_pi = pi_30000
+
+    def histograms_seed_cache(self, histograms: list[HistogramInterop]):
+        logging.info('PiAdapter.histograms_seed_cache(...)')
 
         # seed the cache
-        for num in nums:
-            self.histogram(num)
-
-    @cache
-    def histogram(self, num_digits: int) -> list[int]:
-        def compare(v1: int, v2: int):
-            return v1 == v2
-
-        self._cache_pi_digits(num_digits)
-
-        rc: list[int] = []
-
-        # leverage the fact that pi_digit_generator is idempotent for some max num_digits value
-        # the first num_digits of pi will be the same for any num_digits value up to and including num_digits
-        digits = [n for n in self._cached_pi[:num_digits]]
-
-        for d in range(10):
-            compare_d = partial(compare, v2=d)
-            rc.append(len([v for v in filter(compare_d, digits)]))
+        self.histograms = {hi.num_digits: hi.histogram for hi in histograms}
 
         from pprint import pformat
-        logging.info(f'PiAdapter.histogram({num_digits}): {pformat(rc)}')
+        logging.info(f'PiAdapter.histograms_seed_cache: histograms={pformat(self.histograms, width=132, sort_dicts=False)}')
 
+    def histogram(self, num_digits: int) -> list[int]:
+        rc: list[int] = self.histograms[num_digits] if num_digits in self.histograms else []
         return rc
 
     def pi_digits(self, num_digits: int, n: int) -> list[list[int]]:

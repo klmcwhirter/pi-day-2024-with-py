@@ -5,8 +5,8 @@
 ./create_venv
 source .venv/bin/activate
 
-# Generate the pi digits cache module
-python -m piadapter.pi_digits piadapter/pi_30000.py
+# Generate the pi digits cache module(s)
+python -m piadapter.pi_digits pi-zig/src/pi_30000.zig
 rm -fr piadapter/__pycache__/ 2>&1 >/dev/null
 
 # Generate the pyodide module zip file
@@ -25,8 +25,10 @@ then
 
     if [ $rc -ne 0 ]
     then
-        cat pytest.out >pythontests.failed
+        mv pytest.out python-tests.failed
         exit 0
     fi
-    cat pytest.out >pythontests.passed
+    mv pytest.out python-tests.passed
+else
+    mv pytest.out python-tests.skipped
 fi

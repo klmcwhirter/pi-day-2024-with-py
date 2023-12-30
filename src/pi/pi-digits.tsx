@@ -95,7 +95,7 @@ export const PiDigitsHistogram: Component = (props) => {
           <span class='mr-2'>first</span>
           <select
             class='rounded-lg pl-2 pr-1 text-blue-800 ring-2 ring-stone-100 hover:font-semibold hover:ring-stone-500'
-            value={values()?.total}
+            value={values()?.num_digits}
             onInput={(e) => setSelected(+e.currentTarget.value)}
           >
             <For each={WELL_KNOWN_NUMS}>
