@@ -1,6 +1,7 @@
 import { Resource, createContext, createResource, useContext } from 'solid-js';
 
-import { PiAdapter, loadPython } from './pyodide.loader';
+import { PiAdapter, loadWasm } from './pyodide.loader';
+import { logJS } from './zighisto.loader.js';
 
 export class PiState {
   constructor(
@@ -12,23 +13,20 @@ export class PiState {
 const PiStateContext = createContext<PiState>();
 
 export const PiAdapterProvider = (props) => {
-  const [piAdapter] = createResource(loadPython, {
+  const [piAdapter] = createResource(loadWasm, {
     initialValue: new PiAdapter(null),
   });
 
   const fetchSeeded = (adapter: PiAdapter): boolean => {
-    console.log(`JS: fetchSeeded(adapter)`, adapter);
+    logJS(`fetchSeeded(adapter)`, adapter);
 
     if (adapter) {
       const _task: number = requestIdleCallback(() => {
-        console.log(`JS: fetchSeeded(adapter) ... done`, adapter);
+        logJS(`fetchSeeded(adapter) ... done`, adapter);
         mutateSeeded((_prev) => adapter.seeded);
       });
     } else {
-      console.log(
-        `JS: fetchSeeded(adapter): already requested seeding ... skipping`,
-        adapter,
-      );
+      logJS(`fetchSeeded(adapter): already requested seeding ... skipping`, adapter);
     }
 
     return adapter.seeded;

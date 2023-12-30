@@ -4,6 +4,7 @@ import logging
 import os
 import sys
 from dataclasses import dataclass
+from functools import cache, partial
 
 from piadapter.pi_digits import pi_digit_generator
 from piadapter.utils import batched
@@ -21,6 +22,7 @@ logging.basicConfig(level=logging.DEBUG, format='PYTHON: {asctime} - {module} - 
 class PiAdapter:
     def __init__(self) -> None:
         self._cached_pi: list[int] = []
+        self.histograms = []
 
     def __repr__(self) -> str:
         return 'PiAdapter()'
@@ -41,8 +43,31 @@ class PiAdapter:
         from pprint import pformat
         logging.info(f'PiAdapter.histograms_seed_cache: histograms={pformat(self.histograms, width=132, sort_dicts=False)}')
 
+    @cache
     def histogram(self, num_digits: int) -> list[int]:
         rc: list[int] = self.histograms[num_digits] if num_digits in self.histograms else []
+
+        if len(rc) == 0:
+            #
+            # leave this logic here for perf tests
+            #
+
+            def compare(v1: int, v2: int):
+                return v1 == v2
+
+            self._cache_pi_digits(num_digits)
+
+            # leverage the fact that pi_digit_generator is idempotent for some max num_digits value
+            # the first num_digits of pi will be the same for any num_digits value up to and including num_digits
+            digits = [n for n in self._cached_pi[:num_digits]]
+
+            for d in range(10):
+                compare_d = partial(compare, v2=d)
+                rc.append(len([v for v in filter(compare_d, digits)]))
+
+            from pprint import pformat
+            logging.info(f'PiAdapter.histogram({num_digits}): {pformat(rc)}')
+
         return rc
 
     def pi_digits(self, num_digits: int, n: int) -> list[list[int]]:

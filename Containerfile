@@ -44,7 +44,7 @@ COPY . /app
 COPY --from=zigbuild /app/zig-build* .
 COPY --from=zigbuild /app/zig-tests* .
 # used for integration testing pi-zig.wasm: execute `node public/pi-zig.js` in the container
-COPY --from=zigbuild /app/src/pi-zig.js ./public/pi-zig.js
+COPY --from=zigbuild /app/zig-out/lib/pi-zig.js ./public/pi-zig.js
 COPY --from=zigbuild /app/zig-out/lib/pi-zig.wasm ./public/pi-zig.wasm
 
 COPY --from=pythonbuild /app/piadapter.zip .

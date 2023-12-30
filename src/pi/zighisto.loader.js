@@ -14,12 +14,27 @@ const wrapped_js_output = (outputFunc) => {
 
 export const logJS = wrapped_js_output(console.log);
 
-export let wasm_histogram, wasm_pi_digits;
+export let wasm_histogram, wasm_pi_digits, wasm_zig_version;
 let wasm_alloc, wasm_free, wasm_memory;
+
+// Convenience function to prepare a typed byte array
+// from a pointer and a length into WASM memory.
+function getView(ptr, len) {
+    return new Uint8Array(wasm_memory.buffer, ptr, len);
+}
 
 // Decode UTF-8 typed byte array in WASM memory into
 // UTF-16 JS string.
-const decodeStr = (ptr, len) => new TextDecoder().decode(new Uint8Array(wasm_memory.buffer, ptr, len));
+const decodeStr = (ptr, len) => new TextDecoder().decode(getView(ptr, len));
+
+// JS strings are UTF-16 and have to be encoded into an
+// UTF-8 typed byte array in WASM memory.
+const encodeStr = (str) => {
+    const capacity = str.length * 2 + 5; // As per MDN
+    const ptr = wasm_alloc(capacity);
+    const { written } = new TextEncoder().encodeInto(str, getView(ptr, capacity));
+    return [ptr, written, capacity];
+}
 
 // The environment we export to WASM.
 const importObject = {
@@ -28,6 +43,11 @@ const importObject = {
         consoleLog: (ptr, len) => {
             const msg = decodeStr(ptr, len);
             console.log(`ZIG: ${current_time()} ${msg}`);
+        },
+        version: (ptr, len) => {
+            const msg = decodeStr(ptr, len);
+            wasm_zig_version = `zig: ${msg}`;
+            console.log(wasm_zig_version);
         }
     }
 };
@@ -36,12 +56,20 @@ export const loadZigWasm = async () =>
     await WebAssembly
         .instantiateStreaming(fetch(WASMFILE), importObject)
         .then(wasmModule => {
-            const { histogram, pi_digits, pi_digits_len, alloc, free, memory } = wasmModule.instance.exports;
+            const { histogram, pi_digits, pi_digits_len, alloc, free, memory, zlog, zig_version } = wasmModule.instance.exports;
             wasm_histogram = histogram;
             wasm_pi_digits = new Uint8Array(memory.buffer, pi_digits(), pi_digits_len());
             wasm_alloc = alloc;
             wasm_free = free;
             wasm_memory = memory;
+
+            zig_version();
+
+            const [ptr, len, capacity] = encodeStr("Hello from Zig + JS + WASM 🦎⚡!");
+            zlog(ptr, len);
+
+            // We need to manually free the string's bytes in WASM memory.
+            wasm_free(ptr, capacity);
         });
 
 export const loadZigHistograms = async (numbers) => {

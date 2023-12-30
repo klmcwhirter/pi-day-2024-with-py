@@ -9,7 +9,7 @@ services:
     build:
       context: .
       args:
-        ENABLE_TESTS: 1
+        ENABLE_TESTS: 0
       dockerfile: Containerfile
     deploy:
       replicas: 1

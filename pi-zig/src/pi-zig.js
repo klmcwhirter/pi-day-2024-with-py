@@ -34,7 +34,12 @@ const importObject = {
         // We export this function to WASM land.
         consoleLog: (ptr, len) => {
             const msg = decodeStr(ptr, len);
-            console.log(msg);
+            console.log(`ZIG: ${msg}`);
+        },
+        version: (ptr, len) => {
+            const msg = decodeStr(ptr, len);
+            wasm_zig_version = `zig: ${msg}`;
+            console.log(wasm_zig_version);
         }
     }
 };
@@ -42,23 +47,25 @@ const importObject = {
 const call_funcs = wasmModule => {
     jsLog(wasmModule.instance.exports);
 
-    ({ histogram, pi_digits, pi_digits_len, alloc, free, memory } = wasmModule.instance.exports);
+    ({ histogram, pi_digits, pi_digits_len, alloc, free, memory, zlog, zig_version } = wasmModule.instance.exports);
     wasm_histogram = histogram;
     wasm_pi_digits = new Uint8Array(memory.buffer, pi_digits(), pi_digits_len());
     wasm_alloc = alloc;
     wasm_free = free;
     wasm_memory = memory;
 
+    zig_version();
+
     jsLog(`pi_digits_len=${pi_digits_len()}, pi_digits=${pi_digits()}`);
 
     console.log('JS: wasm_pi_digits: ', wasm_pi_digits);
 
     // Passing a string across the JS to WASM boundary.
-
-    // const [ptr, len, capacity] = encodeStr("Hello from Zig + JS + WASM 🦎⚡!");
+    const [ptr, zlen, capacity] = encodeStr("Hello from Zig + JS + WASM 🦎⚡!");
+    zlog(ptr, zlen);
 
     // We need to manually free the string's bytes in WASM memory.
-    // free(ptr, capacity);
+    wasm_free(ptr, capacity);
 
     const len = 10;  // an element for each digit 0-9
 
