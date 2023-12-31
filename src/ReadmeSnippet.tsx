@@ -3,6 +3,7 @@ import { ExpandableSection } from './components';
 export const ReadmeSnippet = () => (
   <ExpandableSection
     class='hover:text-md m-4 rounded-lg bg-green-50 p-2 text-left text-sm text-blue-800 ring-1 ring-stone-500'
+    default={true}
     fallback={<p>Expand Readme snippet ...</p>}
   >
     <p class='mt-4'>
@@ -12,18 +13,14 @@ export const ReadmeSnippet = () => (
       Many people have contributed to what you see here.
     </p>
 
+    <p class='mt-4'>
+      But once I tuned performance by including some zig code in another WASM component. Wow!
+    </p>
+
     <p class='p-1'>It may not seem earth shattering, but I am blown away.</p>
 
     <p class='p-1'>The Python code in the WASM component can do:</p>
     <ul class='p-1'>
-      <li>
-        <span class='p-1 text-emerald-500'>&pi;</span> data crunching (data
-        science libraries e.g., numpy, pandas, etc. come built into pyodide) -
-        even though I am not using them on purpose
-      </li>
-      <li>
-        <span class='p-1 text-emerald-500'>&pi;</span> make API calls
-      </li>
       <li>
         <span class='p-1 text-emerald-500'>&pi;</span> use Python skilled
         resources on the team where it make sense to do so
@@ -56,7 +53,7 @@ export const ReadmeSnippet = () => (
     </p>
 
     <p class='p-1'>
-      After all, pi day is about celebrating PI vs TAU (from a mathematical
+      After all, pi day is about celebrating PI (from a mathematical
       perspective) and, in my case, practicing the skills of my craft.
     </p>
   </ExpandableSection>

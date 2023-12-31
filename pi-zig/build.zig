@@ -16,6 +16,7 @@ pub fn build(b: *std.Build) void {
             .name = "pi-zig",
             .root_source_file = .{ .path = "src/histo.zig" },
             .target = .{ .cpu_arch = .wasm32, .os_tag = .wasi },
+            // .target = .{ .cpu_arch = .wasm32, .os_tag = .freestanding },
             .optimize = .ReleaseSmall,
         });
         artifact.rdynamic = true;

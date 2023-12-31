@@ -4,7 +4,7 @@ pub const allocator = std.heap.wasm_allocator;
 
 pub fn logConsole(comptime fmt: []const u8, args: anytype) void {
     var hasError: bool = false;
-    var msg: []u8 = if (std.fmt.allocPrint(allocator, fmt, args)) |m|
+    const msg: []u8 = if (std.fmt.allocPrint(allocator, fmt, args)) |m|
         m
     else |_| with_error: {
         hasError = true;
@@ -18,7 +18,7 @@ pub fn logConsole(comptime fmt: []const u8, args: anytype) void {
     }
 
     if (hasError) {
-        var errStr = "Out of memory!";
+        const errStr = "Out of memory!";
         consoleLog(errStr.ptr, errStr.len);
     }
 }

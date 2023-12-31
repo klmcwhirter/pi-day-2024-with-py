@@ -118,5 +118,5 @@ export const loadWasm = async (_load: boolean): Promise<PiAdapter> => {
 };
 
 export const WELL_KNOWN_NUMS: number[] = [
-  10, 100, 1000, 1024, 10000, 20000, 25000, 30000,
+  10, 100, 1000, 1024, 10000, 20000, 25000, 30000, 35000, 40000, 45000, 50000,
 ];

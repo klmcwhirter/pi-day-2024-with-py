@@ -6,7 +6,8 @@
 source .venv/bin/activate
 
 # Generate the pi digits cache module(s)
-python -m piadapter.pi_digits pi-zig/src/pi_30000.zig
+echo python -m piadapter.pi_digits pi-zig/src/pi_digits_seed.zig
+python -m piadapter.pi_digits pi-zig/src/pi_digits_seed.zig
 rm -fr piadapter/__pycache__/ 2>&1 >/dev/null
 
 # Generate the pyodide module zip file

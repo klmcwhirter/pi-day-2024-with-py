@@ -11,31 +11,16 @@ pub fn main() !void {
 
     const n: i32 = 1024;
     const rc_ptr: [*]i32 = histo.histogram(n);
-    const rc: []i32 = try allocator.alloc(i32, 10);
-    defer allocator.free(rc);
+
+    const ten = 10;
+    const rc: []i32 = rc_ptr[0..ten];
+
+    logConsole("[", .{});
 
     var i: usize = 0;
-    while (i < 10) : (i += 1) {
-        // TODO: this is not working! Outputs the following:
-        // histogram(1024) = [
-        // -1431655670,
-        // -1431655649,
-        // -1431655660,
-        // -1431655661,
-        // -1431655672,
-        // -1431655665,
-        // -1431655670,
-        // -1431655669,
-        // -1431655661,
-        // -1431655659,
-        // ]
-        rc[i] = rc_ptr[i];
+    while (i < ten) : (i += 1) {
+        logConsole("{}, ", .{rc[i]});
     }
 
-    logConsole("histogram({}) = [\n", .{n});
-    i = 0;
-    while (i < 10) : (i += 1) {
-        logConsole("{}, \n", .{rc[i]});
-    }
     logConsole("]\n", .{});
 }

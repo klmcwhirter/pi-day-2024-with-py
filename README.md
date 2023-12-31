@@ -67,8 +67,8 @@ The result may not seem earth shattering on the surface, but I am blown away.
 
 The Python code in the WASM component can do:
 
-- data crunching (data science libraries e.g., numpy, pandas, etc. come built into pyodide) - even though I am not using them on purpose, and not much can be done really - see [Downsides](./docs/wasm-downsides.md)
-- make API calls
+- NOT data crunching (data science libraries e.g., numpy, pandas, etc. come built into pyodide) - even though I am not using them on purpose, and not much can be done really - see [Downsides](./docs/wasm-downsides.md)
+- NOT make API calls
 - use Python skilled resources on the team more where it make sense to do so
 - leverage the more expressive nature of Python vs JavaScript to get the job done in a more maintainable way
 - keep the very mature UI workflows using vite, webpack, etc. in place

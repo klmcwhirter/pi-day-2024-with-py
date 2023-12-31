@@ -10,9 +10,10 @@ import { HistogramItemValues, HistogramValues } from './pi-digits.model';
 import { WELL_KNOWN_NUMS } from './pyodide.loader';
 
 const ROWS = 32;
-const COLS = 32;
-// Note that 32 * 32 = 1024
+const COLS = 48;
+// Note that 32 * 48 = 1536
 const NUM_DIGITS = ROWS * COLS;
+const DIGITS_1024 = 1024;
 
 // purple,violet,blue,lightblue,green,yellow,orange,red,crimson,black
 
@@ -79,7 +80,7 @@ export const PiDigitsHistogram: Component = (props) => {
     return Promise.resolve(rc);
   };
 
-  const [selected, setSelected] = createSignal(NUM_DIGITS);
+  const [selected, setSelected] = createSignal(DIGITS_1024);
   const [values] = createResource<HistogramValues, number>(
     selected,
     fetchHistogram,

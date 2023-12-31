@@ -19,7 +19,7 @@ ARG ENABLE_TESTS
 WORKDIR /app
 COPY ./etc /app/etc
 COPY pi-zig /app
-COPY --from=pythonbuild /app/pi-zig/src/pi_30000.zig src/pi_30000.zig
+COPY --from=pythonbuild /app/pi-zig/src/pi_digits_seed.zig src/pi_digits_seed.zig
 
 RUN ZIGVER=0.11.0 && ZIGARCH=zig-linux-x86_64-$ZIGVER.tar.xz && ZIGBIN=zig-bin && \
 apk upgrade --no-cache && \

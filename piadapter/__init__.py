@@ -31,8 +31,8 @@ class PiAdapter:
         if len(self._cached_pi) < num_digits:
             self._cached_pi = [d for d in pi_digit_generator(num_digits)]
 
-    def seed_pi_digits(self, pi_30000: list[int]):
-        self._cached_pi = pi_30000
+    def seed_pi_digits(self, pi_digits_seed: list[int]):
+        self._cached_pi = pi_digits_seed
 
     def histograms_seed_cache(self, histograms: list[HistogramInterop]):
         logging.info('PiAdapter.histograms_seed_cache(...)')
