@@ -5,9 +5,12 @@
 - [Overview](#overview)
 - [Run it](#run-it)
 - [Why pyodide?](#why-pyodide)
+- [Why zig?](#why-zig)
 - [Downsides](./docs/wasm-downsides.md)
 - [Summary](#summary)
 
+---
+![1536 digits of pi](./docs/pi-day-2024-digits.png)
 ---
 
 ## Overview
@@ -35,17 +38,51 @@ There are 3 main features represented by the screenshots below.
 
 ## Run it
 
+### Uses Docker as the only dependency ...
+
 The build and deployment process relies on Docker and docker-compose. But those are the only dependencies (aside from an internet connection).
 
 Just run `docker-compose up` and open [http://localhost:9000/](http://localhost:9000/) in a browser.
 
+The build process takes a little less than 3 mins on my laptop. So be patient before clicking on the link above.
+
+You will see output like the following when it is done building and is ready for the browser:
+
+```
+podman start -a pi-day-2024-with-py_piday2024_1
+[piday2024] | 
+[piday2024] | > vite-template-solid@0.0.0 start
+[piday2024] | > vite
+[piday2024] | 
+[piday2024] | 
+[piday2024] |   VITE v4.5.0  ready in 437 ms
+[piday2024] | 
+[piday2024] |   ➜  Local:   http://localhost:9000/
+[piday2024] |  ...
+```
+
 Hit CTRl-C in the terminal where `docker-compose up` was executed to exit.
 
+Then run `docker-compose down`.
+If you have no other docker images that you want to keep then run this to finish the clean up: `docker system prune -af`.
+
+### NixOS Flakes
 If you are uing the nix package manager with flakes enabled, then simply doing the following will setup the environment and output a reminder of next steps.
+
+> The next steps reminders assume you are running nixos in a VM like I am.
 
 `$ nix develop`
 
+### podman
+
  By the way, yes, podman-compose works as well.
+ To run do: `podman-compose up`.
+
+ When ready to exit hit CTRL-C as with docker.
+
+ Use `podman-compose down -t 0` to expedite the shutdown process. The default is to timeout in 10 secs.
+
+ To clean up do `podman system prune -af`.
 
 ## Why pyodide?
 
@@ -58,6 +95,32 @@ And, both PyScript and iodide use pyodide internally to accomplish their goals.
 I did take a cursory look at a few other things like iodide (that also uses pyodide) and the WASM/WASI tooling being built into cpython itself.
 
 Nothing I found was as ready to use as pyodide - search stopped there for now.
+
+## Why zig?
+After trying emscripten with C, and the go programming language I was disappointed at the complexity involved to get something running.
+
+With [zig](https://ziglang.org/) I was able to get a simple WASM component working in an afternoon. Wow!
+
+And the performance has been amazing. Where Python was taking ~10 secs to generate histograms for 10,100,1000,1024,10000,20000,25000 and 30000 digits of pi - the zig cross-compiled wasm32 code is capable of performing the same thing plus 35000, 40000, 45000 and 50000 in less than 1 ms. Yep 1ms! Wow. The histograms are still generated at runtime. Via a separate WASM call per value of N digits of pi.
+
+> zig also has a slice type in the language. So I just couldn't help myself referring to it as a slice_of_pi in the code. Tee hee hee. _See the histogram function in [pi-zig/src/histo.zig](./pi-zig/src/histo.zig)._
+
+Note I changed the Python cache seed generation logic to produce pi_digits_seed.zig instead of pi_30000.py. _See the bottom of [piadapter/pi_digits.py](./piadapter/pi_digits.py)._
+
+> Note I did some digging and saw that some of the individual coefficient values for the Gosper's series algorithm I settled on
+> exceeds 4000 integer digits! WHOA. Python is the right choice for the language to perform that task.
+
+The zig module exposes pi_digits via its WASM interface and that is called and passed into the Python based PiAdapter class during startup (via pyodide).
+
+Did I mention with zig the startup time went from ~20 secs to ~2.5 secs. Most of what is left is the pyodide startup time.
+
+The pyodide wasm file is 9**MB**! _That is fair if you think about it. It contains the almost complete Python 3.11 runtime plus
+the [various libraries they have ported](https://pyodide.org/en/stable/usage/packages-in-pyodide.html) like attrs, numpy, pandas, etc.
+
+Whereas the pi-zig.wasm file is ~52**KB**.
+![pi-zig.wasm size](./docs/pi-zig-wasm-size.svg)
+
+That is why zig ;)
 
 ## Summary
 
