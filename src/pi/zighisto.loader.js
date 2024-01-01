@@ -49,6 +49,12 @@ const importObject = {
             wasm_zig_version = `zig: ${msg}`;
             console.log(wasm_zig_version);
         }
+    },
+    wasi_snapshot_preview1: {
+        fd_write: (wuserdata, werror, wtype, wfd_readwrite) => {
+            console.error('ZIG: **PANIC** OutOfMemory - fd_write: ', wuserdata, werror, wtype, wfd_readwrite);
+            return -1;
+        }
     }
 };
 

@@ -2,7 +2,7 @@
 
 [ -z "$ENABLE_TESTS" ] && ENABLE_TESTS=0
 
-./create_venv
+ENABLE_TESTS=$ENABLE_TESTS ./create_venv
 source .venv/bin/activate
 
 # Generate the pi digits cache module(s)

@@ -11,16 +11,18 @@ pub fn main() !void {
 
     const n: i32 = 1024;
     const rc_ptr: [*]i32 = histo.histogram(n);
+    defer allocator.free(rc_ptr[0..10]);
 
     const ten = 10;
     const rc: []i32 = rc_ptr[0..ten];
 
     logConsole("[", .{});
 
-    var i: usize = 0;
-    while (i < ten) : (i += 1) {
-        logConsole("{}, ", .{rc[i]});
-    }
+    for (rc) |h| logConsole("{}, ", .{h});
 
     logConsole("]\n", .{});
+}
+
+test {
+    _ = @import("histo.zig");
 }

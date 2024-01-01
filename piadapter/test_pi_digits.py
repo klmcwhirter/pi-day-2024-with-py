@@ -63,6 +63,7 @@ def collect_histogram_for_n_digits(n: int):
     return rc
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize(
     ['n', 'expected_secs'],
     [

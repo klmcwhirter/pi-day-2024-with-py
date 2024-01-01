@@ -11,6 +11,11 @@ pub fn build(b: *std.Build) void {
     // This adds a command line option to zig build via the -D flag. i.e. -Dwasm
     const is_wasm = b.option(bool, "wasm", "build for wasm") orelse false;
     // Now we can make a build decision based on that option.
+
+    const runtimeName = "runtime";
+    const runtimeFile = if (is_wasm) "src/wasm_runtime.zig" else "src/zig_runtime.zig";
+    const runtime = b.addModule(runtimeName, .{ .source_file = .{ .path = runtimeFile } });
+
     if (is_wasm) {
         artifact = b.addSharedLibrary(.{
             .name = "pi-zig",
@@ -50,12 +55,26 @@ pub fn build(b: *std.Build) void {
             .target = target,
             .optimize = optimize,
         });
+        artifact.single_threaded = true;
     }
-
-    const runtimeName = "runtime";
-    const runtimeFile = if (is_wasm) "src/wasm_runtime.zig" else "src/zig_runtime.zig";
-    const runtime = b.addModule(runtimeName, .{ .source_file = .{ .path = runtimeFile } });
     artifact.addModule(runtimeName, runtime);
 
     b.installArtifact(artifact);
+
+    // Creates a step for unit testing. This only builds the test executable
+    // but does not run it.
+    const unit_tests = b.addTest(.{
+        .root_source_file = .{ .path = "src/main.zig" },
+        .target = target,
+        .optimize = optimize,
+    });
+    unit_tests.addModule(runtimeName, runtime);
+
+    const run_unit_tests = b.addRunArtifact(unit_tests);
+
+    // Similar to creating the run step earlier, this exposes a `test` step to
+    // the `zig build --help` menu, providing a way for the user to request
+    // running the unit tests.
+    const test_step = b.step("test", "Run unit tests");
+    test_step.dependOn(&run_unit_tests.step);
 }

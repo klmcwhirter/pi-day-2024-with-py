@@ -38,6 +38,21 @@ zig_dir=`echo $ZIGARCH | sed 's/.tar.xz$//'`
 echo mv ${zig_dir} $ZIGBIN | tee -a step.out
 mv ${zig_dir} $ZIGBIN 2>&1 | tee -a step.out
 
+
+echo "ENABLE_TESTS=$ENABLE_TESTS" | tee -a step.out
+if [ "$ENABLE_TESTS" = "1" ]
+then
+    echo ${ZIGBIN}/zig build test -Dwasm=false --summary all -Doptimize=Debug --verbose
+    ${ZIGBIN}/zig build test -Dwasm=false --summary all -Doptimize=Debug --verbose 2>&1 | tee -a step.out
+    rc=$?
+    echo test rc=${rc}
+    clean_up $rc ${ZIG_TESTS}
+else
+    mv step.out ${ZIG_TESTS}.skipped
+fi
+echo rm -fr zig-cache/ zig-out/
+rm -fr zig-cache/ zig-out/
+
 echo ${ZIGBIN}/zig build copy-js --summary all -Dwasm --verbose
 ${ZIGBIN}/zig build copy-js --summary all -Dwasm --verbose 2>&1 | tee -a step.out
 rc=$?
@@ -49,15 +64,3 @@ if [ $rc -ne 0 ];then
 else
     clean_up $rc ${ZIG_BUILD}
 fi
-
-echo "ENABLE_TESTS=$ENABLE_TESTS but skipping anyway until working with -Dwasm=false" >step.out
-# if [ "$ENABLE_TESTS" = "1" ]
-# then
-#     echo ${ZIGBIN}/zig test src/histo.zig
-#     ${ZIGBIN}/zig test src/histo.zig 2>&1 | tee -a step.out
-#     rc=$?
-#     echo test rc=${rc}
-#     clean_up $rc ${ZIG_TESTS}
-# else
-    mv step.out ${ZIG_TESTS}.skipped
-# fi

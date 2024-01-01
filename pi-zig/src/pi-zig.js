@@ -13,7 +13,7 @@ let wasm_pi_digits, wasm_histogram;
 
 // Convenience function to prepare a typed byte array
 // from a pointer and a length into WASM memory.
-const getView = (ptr, len) => new Uint8Array(memory.buffer, ptr, len);
+const getView = (ptr, len) => new Uint8Array(wasm_memory.buffer, ptr, len);
 
 // JS strings are UTF-16 and have to be encoded into an
 // UTF-8 typed byte array in WASM memory.
@@ -41,13 +41,19 @@ const importObject = {
             wasm_zig_version = `zig: ${msg}`;
             console.log(wasm_zig_version);
         }
+    },
+    wasi_snapshot_preview1: {
+        fd_write: (wuserdata, werror, wtype, wfd_readwrite) => {
+            console.error('ZIG: **PANIC** OutOfMemory - fd_write: ', wuserdata, werror, wtype, wfd_readwrite);
+            return -1;
+        }
     }
 };
 
 const call_funcs = wasmModule => {
     jsLog(wasmModule.instance.exports);
 
-    ({ histogram, pi_digits, pi_digits_len, alloc, free, memory, zlog, zig_version } = wasmModule.instance.exports);
+    const { histogram, pi_digits, pi_digits_len, alloc, free, memory, zlog, zig_version } = wasmModule.instance.exports;
     wasm_histogram = histogram;
     wasm_pi_digits = new Uint8Array(memory.buffer, pi_digits(), pi_digits_len());
     wasm_alloc = alloc;
@@ -69,13 +75,15 @@ const call_funcs = wasmModule => {
 
     const len = 10;  // an element for each digit 0-9
 
-    jsLog('histogram(1024, ...)');
-    const rc = histogram(1024);
-    const array = new Int32Array(memory.buffer, rc, 10);
-    if (array) {
-        console.log('JS: array: ', array);
+    jsLog('histogram(10, ...)');
+    const rc = wasm_histogram(10);
+    if (rc) {
+        const array = new Int32Array(memory.buffer, rc, 10);
+        if (array) {
+            console.log('JS: array: ', array);
 
-        wasm_free(array.buffer);
+            wasm_free(array.buffer);
+        }
     }
 };
 
