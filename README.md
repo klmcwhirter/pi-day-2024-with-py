@@ -24,9 +24,9 @@ The meat of that is in [pyodide.loader.ts](./src/pi/pyodide.loader.ts) and the [
 
 There are 3 main features represented by the screenshots below.
 
-- 1024 Digits of Pi - [pi-day-2024-digits.png](./docs/pi-day-2024-digits.png) - this is a repeat of my [pi-day-2021-with-py](https://github.com/klmcwhirter/pi-day-2021-with-py) project where I did something similar with guizero
-- A histogram of the occurrences of the base 10 digits in the first _selectable_ digits of pi - [pi-day-2024-histogram.png](./docs/pi-day-2024-histogram.png). The drop down contains values for 10 up to 30,000 digits of pi.
-- [pi-day-2024-footer.png](./docs/pi-day-2024-footer.png) - hover over the footer to see version information from both the python and Javascript parts of the app.
+- 1536 Digits of Pi - [pi-day-2024-digits.png](./docs/pi-day-2024-digits.png) - this is a repeat of my [pi-day-2021-with-py](https://github.com/klmcwhirter/pi-day-2021-with-py) project where I did something similar with guizero
+- A histogram of the occurrences of the base 10 digits in the first _selectable_ digits of pi - [pi-day-2024-histogram.png](./docs/pi-day-2024-histogram.png). The drop down contains values for 10 up to 50,000 digits of pi.
+- [pi-day-2024-footer.png](./docs/pi-day-2024-footer.png) - hover over the footer to see version information from the zig, the python and Javascript parts of the app.
 - the loading screen that hides the initialization process is [pi-day-2024-loading.png](./docs/pi-day-2024-loading.png)
 
 > Please note that this is an absolutely useless architecture pattern. Don't use it!
