@@ -17,19 +17,19 @@
 
 In spirit, this is just a reimplementation of [pi-day-2021-with-py](https://github.com/klmcwhirter/pi-day-2021-with-py). But it is, oh, so much more than that.
 
-It uses [SolidJS](https://www.solidjs.com/) and [pyodide](https://pyodide.org/), and runs completely in the browser.
+It uses [SolidJS](https://www.solidjs.com/), [pyodide](https://pyodide.org/), and [zig](https://ziglang.org/) and runs completely in the browser.
 
 Pyodide provides Python (version 3.11.3 as I write this including most of stdlib and several data science libs) as a WASM component which runs in the browser. I use it via an adapter (or Proxy) because it contains the pi digit generator logic written in Python!
 
-The UI interacts with the Python WASM component via Typescript.
+The UI interacts with the Python WASM and zig WASM components via Typescript.
 
-The meat of that is in [pyodide.loader.ts](./src/pi/pyodide.loader.ts) and the [piadapter](./piadapter/__init__.py) Python module.
+The meat of that is in [pyodide.loader.ts](./src/pi/pyodide.loader.ts) and the [piadapter](./piadapter/__init__.py) Python module, and [pi-zig](./pi-zig/src/histo.zig) zig module.
 
-There are 3 main features represented by the screenshots below.
+These are the main features represented by the screenshots below.
 
 - 1536 Digits of Pi - [pi-day-2024-digits.png](./docs/pi-day-2024-digits.png) - this is a repeat of my [pi-day-2021-with-py](https://github.com/klmcwhirter/pi-day-2021-with-py) project where I did something similar with guizero
 - A histogram of the occurrences of the base 10 digits in the first _selectable_ digits of pi - [pi-day-2024-histogram.png](./docs/pi-day-2024-histogram.png). The drop down contains values for 10 up to 50,000 digits of pi.
-- [pi-day-2024-footer.png](./docs/pi-day-2024-footer.png) - hover over the footer to see version information from the zig, the python and Javascript parts of the app.
+- [pi-day-2024-footer.png](./docs/pi-day-2024-footer.png) - hover over the footer to see version information from the zig, the python and Typescript parts of the app.
 - the loading screen that hides the initialization process is [pi-day-2024-loading.png](./docs/pi-day-2024-loading.png)
 
 > Please note that this is an absolutely useless architecture pattern. Don't use it!
