@@ -56,8 +56,8 @@ export const AppDescription = (props) => {
             classList={classlistFor(state(), AppStateEnum.DIGITS)}
           >
             The generator of the digits of pi is written in python.
-            It is used at build time to create a zig module that is used as a cache seed.
-            It is then accessed at runtime via a zig WASM component.
+            It is used at build time to create code that is used as a cache seed.
+            It is then accessed at runtime via a another WASM component.
           </p>
           <p
             class='mt-2 text-sm text-blue-500'
@@ -84,8 +84,7 @@ export const AppDescription = (props) => {
             class='mt-2 text-sm text-blue-500'
             classList={classlistFor(state(), AppStateEnum.HISTOGRAM)}
           >
-            The code that produces the data for the histogram is written in
-            zig.
+            The code that produces the data for the histogram is written in another language.
           </p>
           <p
             class='mt-2 text-sm text-blue-500'

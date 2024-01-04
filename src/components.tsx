@@ -146,7 +146,7 @@ export const NavView = (props) => {
       <ul class='shadow-lg'>
         <For each={appStates}>
           {(s) => (
-            <li class='p-2'>
+            <li class='m-1 p-2 inline-block'>
               <button
                 disabled={!piState.seeded()}
                 class='hover:disabled::cursor-auto m-2 block p-2 rounded-lg bg-emerald-50 text-lg text-blue-700

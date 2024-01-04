@@ -1,13 +1,23 @@
 #!/bin/sh
 
+
+if [ -z "$PI_DIGITS_FILE" ]
+then
+    echo "PI_DIGITS_FILE cannot be empty" | tee python-tests.failed
+    exit 255
+fi
+
 [ -z "$ENABLE_TESTS" ] && ENABLE_TESTS=0
 
-ENABLE_TESTS=$ENABLE_TESTS ./create_venv
-source .venv/bin/activate
+if [ "$ENABLE_TESTS" != "0" ]
+then
+    ENABLE_TESTS=$ENABLE_TESTS ./create_venv
+    source .venv/bin/activate
+fi
 
 # Generate the pi digits cache module(s)
-echo python -m piadapter.pi_digits pi-zig/src/pi_digits_seed.zig
-python -m piadapter.pi_digits pi-zig/src/pi_digits_seed.zig
+echo python -m piadapter.pi_digits $PI_DIGITS_FILE
+python -m piadapter.pi_digits $PI_DIGITS_FILE
 rm -fr piadapter/__pycache__/ 2>&1 >/dev/null
 
 # Generate the pyodide module zip file

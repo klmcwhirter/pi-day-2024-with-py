@@ -25,6 +25,15 @@ function clean_up
 
 set -o pipefail
 
+if [ -z "$PI_DIGITS_FILE" -o ! -f "$PI_DIGITS_FILE" ]
+then
+    echo "PI_DIGITS_FILE cannot be empty and file must exist" | tee -a step.out
+
+    clean_up 255 ${ZIG_BUILD}
+    echo "tinygo build failed" >${ZIG_TESTS}.skipped
+    exit 255
+fi
+
 if [ -z "$ZIGARCH" ]
 then
     echo "ZIGARCH cannot be empty" >>step.out

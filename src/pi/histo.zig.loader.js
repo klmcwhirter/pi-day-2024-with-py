@@ -1,20 +1,8 @@
+import { current_time, logJS } from "./utils";
 
 const WASMFILE = 'pi-zig.wasm';
 
-const current_time = () => {
-    const d = new Date();
-    return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()},${d.getMilliseconds()}`;
-};
-
-const wrapped_js_output = (outputFunc) => {
-    return (msg) => {
-        outputFunc(`JS: ${current_time()} ${msg}`);
-    };
-};
-
-export const logJS = wrapped_js_output(console.log);
-
-export let wasm_histogram, wasm_pi_digits, wasm_zig_version;
+export let histo_histogram, histo_pi_digits, histo_version;
 let wasm_alloc, wasm_free, wasm_memory;
 
 // Convenience function to prepare a typed byte array
@@ -46,8 +34,8 @@ const importObject = {
         },
         version: (ptr, len) => {
             const msg = decodeStr(ptr, len);
-            wasm_zig_version = `zig: ${msg}`;
-            console.log(wasm_zig_version);
+            histo_version = `zig: ${msg}`;
+            console.log(histo_version);
         }
     },
     wasi_snapshot_preview1: {
@@ -58,19 +46,20 @@ const importObject = {
     }
 };
 
-export const loadZigWasm = async () =>
+export const loadOtherWasm = async () =>
     await WebAssembly
         .instantiateStreaming(fetch(WASMFILE), importObject)
         .then(wasmModule => {
             const { histogram, pi_digits, pi_digits_len, alloc, free, memory, zlog, zig_version } = wasmModule.instance.exports;
-            wasm_histogram = histogram;
-            wasm_pi_digits = new Uint8Array(memory.buffer, pi_digits(), pi_digits_len());
+            histo_histogram = histogram;
+            histo_pi_digits = new Uint8Array(memory.buffer, pi_digits(), pi_digits_len());
             wasm_alloc = alloc;
             wasm_free = free;
             wasm_memory = memory;
 
             zig_version();
 
+            // Passing a unicode string across the JS to WASM boundary.
             const [ptr, len, capacity] = encodeStr("Hello from Zig + JS + WASM 🦎⚡!");
             zlog(ptr, len);
 
@@ -78,12 +67,12 @@ export const loadZigWasm = async () =>
             wasm_free(ptr, capacity);
         });
 
-export const loadZigHistograms = async (numbers) => {
+export const loadHistograms = async (numbers) => {
     logJS('Start calc-ing histograms...');
 
     const rc = [];
     for (let i = 0; i < numbers.length; i++) {
-        const histo_ptr = wasm_histogram(numbers[i]);
+        const histo_ptr = histo_histogram(numbers[i]);
         if (histo_ptr) {
             const histogram_i32 = new Int32Array(wasm_memory.buffer, histo_ptr, 10);
             wasm_free(histo_ptr);

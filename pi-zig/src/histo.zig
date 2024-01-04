@@ -77,6 +77,11 @@ export fn pi_digits_len() usize {
     return pi_digits_seed.len;
 }
 
+test "should have pi_digits_seed available" {
+    std.debug.print("\nChecking pi_digits_seed.len: {} to be 50_000...\n", .{pi_digits_seed.len});
+    try testing.expectEqual(50000, pi_digits_seed.len);
+}
+
 /// Allocate `len` bytes in WASM memory. Returns
 /// many item pointer on success, null on error.
 pub export fn alloc(len: usize) ?[*]u8 {

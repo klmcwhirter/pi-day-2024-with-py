@@ -5,9 +5,11 @@
 - [Overview](#overview)
 - [Run it](#run-it)
 - [Why pyodide?](#why-pyodide)
-- [Why zig?](#why-zig)
-- [Downsides](./docs/wasm-downsides.md)
+- [Why AssemblyScript?](#why-assemblyscript)
 - [Summary](#summary)
+- [Downsides](./docs/wasm-downsides.md)
+- [Rabbit Holes I Travelled Down](./docs/rabbit-holes.md)
+- [References](./docs/references.md)
 
 ---
 ![1536 digits of pi](./docs/pi-day-2024-digits.png)
@@ -17,13 +19,13 @@
 
 In spirit, this is just a reimplementation of [pi-day-2021-with-py](https://github.com/klmcwhirter/pi-day-2021-with-py). But it is, oh, so much more than that.
 
-It uses [SolidJS](https://www.solidjs.com/), [pyodide](https://pyodide.org/), and [zig](https://ziglang.org/) and runs completely in the browser.
+It uses [SolidJS](https://www.solidjs.com/), [pyodide](https://pyodide.org/), [assemblyscript](https://www.assemblyscript.org/), [tinygo](https://tinygo.org/docs/guides/webassembly/wasm/) and [zig](https://ziglang.org/) and runs completely in the browser!
 
 Pyodide provides Python (version 3.11.3 as I write this including most of stdlib and several data science libs) as a WASM component which runs in the browser. I use it via an adapter (or Proxy) because it contains the pi digit generator logic written in Python!
 
-The UI interacts with the Python WASM and zig WASM components via Typescript.
+The UI interacts with the Python WASM and, by default, an assemblyscript WASM component via Typescript. go and zig options are available as well.
 
-The meat of that is in [pyodide.loader.ts](./src/pi/pyodide.loader.ts) and the [piadapter](./piadapter/__init__.py) Python module, and [pi-zig](./pi-zig/src/histo.zig) zig module.
+The meat of that is in [pyodide.loader.ts](./src/pi/pyodide.loader.ts) and the [piadapter](./piadapter/__init__.py) Python module, and [pi-as](./pi-as/assembly/index.ts) assemblyscript module.
 
 These are the main features represented by the screenshots below.
 
@@ -96,31 +98,33 @@ I did take a cursory look at a few other things like iodide (that also uses pyod
 
 Nothing I found was as ready to use as pyodide - search stopped there for now.
 
-## Why zig?
-After trying emscripten with C, and the go programming language I was disappointed at the complexity involved to get something running.
+## Why AssemblyScript?
+After trying emscripten with C, and zig and tinygo I was disappointed at the complexity involved to get something running.
 
-With [zig](https://ziglang.org/) I was able to get a simple WASM component working in an afternoon. Wow!
+With [assemblyscript](https://www.assemblyscript.org/) I was able to get a simple WASM component working in an afternoon.
 
-And the performance has been amazing. Where Python was taking ~10 secs to generate histograms for 10,100,1000,1024,10000,20000,25000 and 30000 digits of pi - the zig cross-compiled wasm32 code is capable of performing the same thing plus 35000, 40000, 45000 and 50000 in less than 1 ms. Yep 1ms! Wow. The histograms are still generated at runtime. Via a separate WASM call per value of N digits of pi.
+And the performance has been amazing. Where Python was taking ~10 secs to generate histograms for 10,100,1000,1024,10000,20000,25000 and 30000 digits of pi - the WASM code is capable of performing the same thing plus 35000, 40000, 45000 and 50000 in less than 1 ms. Yep 1ms! Wow. The histograms are still generated at runtime. Via a separate WASM call per value of N digits of pi.
 
-> zig also has a slice type in the language. So I just couldn't help myself referring to it as a slice_of_pi in the code. Tee hee hee. _See the histogram function in [pi-zig/src/histo.zig](./pi-zig/src/histo.zig)._
+> The languages I worked with all have a slice type in their language. So I just couldn't help myself referring to it as a slice_of_pi in the code. Tee hee hee. _See the histogram function in [pi-as/assembly/index.ts](./pi-as/assembly/index.ts)._
 
-Note I changed the Python cache seed generation logic to produce pi_digits_seed.zig instead of pi_30000.py. _See the bottom of [piadapter/pi_digits.py](./piadapter/pi_digits.py)._
+Note I changed the Python cache seed generation logic to produce pi_digits_seed.ts instead of pi_30000.py. _See the bottom of [piadapter/pi_digits.py](./piadapter/pi_digits.py)._
 
 > Note I did some digging and saw that some of the individual coefficient values for the Gosper's series algorithm I settled on
 > exceeds 4000 integer digits! WHOA. Python is the right choice for the language to perform that task.
 
-The zig module exposes pi_digits via its WASM interface and that is called and passed into the Python based PiAdapter class during startup (via pyodide).
+The as module exposes pi_digits via its WASM interface and that is called and passed into the Python based PiAdapter class during startup (via pyodide).
 
-Did I mention with zig the startup time went from ~20 secs to ~2.5 secs. Most of what is left is the pyodide startup time.
+Did I mention with the other WASM components the startup time went from ~20 secs to ~2.5 secs. Most of what is left is the pyodide startup time.
 
 The pyodide wasm file is 9**MB**! _That is fair if you think about it. It contains the almost complete Python 3.11 runtime plus
 the [various libraries they have ported](https://pyodide.org/en/stable/usage/packages-in-pyodide.html) like attrs, numpy, pandas, etc.
 
-Whereas the pi-zig.wasm file is ~52**KB**.
-![pi-zig.wasm size](./docs/pi-zig-wasm-size.svg)
+Whereas the pi-as.wasm file is ~58**KB**.
+![pi-as.wasm size](./docs/pi-as-wasm-size.png)
 
-That is why zig ;)
+And, the assemblyscript WASM component is tremendously simpler in terms of the code to implement the WASM code and to consume it.
+
+That is why assemblyscript ;)
 
 ## Summary
 
@@ -139,11 +143,13 @@ The Python code in the WASM component can do:
 - nodejs, SSR, now rust - WASM is a natural addition to the distributed presentation discussion whether it be client or server side (as you will find readily available commentary)
 - integrating with other WASM components that will become available as things mature
 
+WASM is great for CPU or I/O intensive operations. They execute at near native speeds.
+
+I have 3 implementations: [assemblyscript](./pi-as/) (as), [golang](./pi-tinygo/) (tinygo) and [zig](./pi-zig/). At the end of the day
+is is just Web Assembly - they perform similarly. Executing the histogram function in &lt; 1ms
+whereas pyodide takes multiple seconds per invocation. That is not Python's fault; just pyodide
+overhead.
+
 Here I only pursue client side - because it was fun to do and I was curious.
 
 After all, pi day is about celebrating PI in any ludracous way imaginable (not just from a mathematical perspective) and, in my case, practicing the skills of my craft.
-
-## Notes
-
-- [References](./docs/references.md)
-

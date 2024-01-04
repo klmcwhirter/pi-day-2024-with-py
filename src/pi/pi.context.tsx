@@ -1,7 +1,7 @@
 import { Resource, createContext, createResource, useContext } from 'solid-js';
 
 import { PiAdapter, loadWasm } from './pyodide.loader';
-import { logJS } from './zighisto.loader.js';
+import { logJS } from './utils.js';
 
 export class PiState {
   constructor(

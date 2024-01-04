@@ -1,7 +1,8 @@
 import { loadPyodide } from '/node_modules/pyodide/pyodide.mjs';
 import type { PyProxy } from 'pyodide/ffi';
 
-import { loadZigHistograms, loadZigWasm, logJS, wasm_pi_digits, wasm_zig_version } from './zighisto.loader.js';
+import { loadHistograms, loadOtherWasm, histo_pi_digits, histo_version } from './histo.loader.js';
+import { logJS } from './utils.js';
 
 let pyodide;
 
@@ -70,7 +71,7 @@ export class PiAdapter {
   version(): string[] {
     logJS('version()');
     const pyVersions = this.piaProxy?.version() || ['Python is loading...'];
-    return [wasm_zig_version, `pyodide.version: ${pyodide?.version}`, ...pyVersions];
+    return [histo_version, `pyodide.version: ${pyodide?.version}`, ...pyVersions];
   }
 }
 
@@ -95,18 +96,18 @@ export const loadWasm = async (_load: boolean): Promise<PiAdapter> => {
   const pia = await loadPiadapter(pyodide);
   logJS('back from loading piadapter', pia);
 
-  logJS('loading zig WASM ...');
-  await loadZigWasm();
-  logJS('loading zig WASM ... done');
+  logJS('loading other WASM ...');
+  await loadOtherWasm();
+  logJS('loading other WASM ... done');
 
   logJS('The server can be shutdown now. Everything is running in the browser.');
 
   const piAdapter = new PiAdapter(pia);
-  piAdapter.seed_pi_digits(wasm_pi_digits);
+  piAdapter.seed_pi_digits(histo_pi_digits);
 
   logJS('loading histograms');
 
-  const histograms: HistogramInterop[] = await loadZigHistograms(WELL_KNOWN_NUMS);
+  const histograms: HistogramInterop[] = await loadHistograms(WELL_KNOWN_NUMS);
 
   logJS('back from loading histograms');
 

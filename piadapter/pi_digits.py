@@ -3,6 +3,8 @@
 import logging
 from typing import Generator
 
+from .utils import pi_digits_writer_from_ext
+
 
 def pi_digit_generator(num_digits: int) -> Generator[int, None, None]:
     '''
@@ -51,19 +53,18 @@ if __name__ == '__main__':
     import sys
 
     if len(sys.argv) < 2:
-        print('Usage: python -m piadapter.pi_digits filename.zig')
+        print('Usage: python -m piadapter.pi_digits filename.ext\nwhere ext is one of go, py, zig')
         sys.exit(1)
 
     logging.info('Start generating 50_000 digits of pi ...')
-    __digits = [d for d in pi_digit_generator(50_000)]
+    digits = [d for d in pi_digit_generator(50_000)]
     logging.info('Done generating 50_000 digits of pi')
 
     logging.info(f'Start writing to {sys.argv[1]}...')
 
+    writer = pi_digits_writer_from_ext(sys.argv[1])
+
     with open(sys.argv[1], 'w') as f:
-        print("// Automatically generated via python -m piadapter.pi_digits pi-zig/src/pi_digits_seed.zig", file=f)
-        print('pub const pi_digits_seed: []u8 = &pi_digits_seed_array;', file=f)
-        print('var pi_digits_seed_array = [_]u8{', end='', file=f)
-        print(', '.join(str(d) for d in __digits), end='', file=f)
-        print('};', file=f)
+        writer(f, digits)
+
     logging.info(f'Done writing to {sys.argv[1]}.')

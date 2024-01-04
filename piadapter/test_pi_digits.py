@@ -24,6 +24,13 @@ def test_pi_digit_generator_first_10():
     assert expected == rc
 
 
+def test_adapter_pi_digits_first_10(adapter: PiAdapter):
+    expected = [[3, 1, 4, 1, 5, 9, 2, 6, 5, 3]]
+    rc = adapter.pi_digits(10, 10)
+
+    assert expected == rc
+
+
 @pytest.mark.parametrize(
     ['n', 'expected'],
     [

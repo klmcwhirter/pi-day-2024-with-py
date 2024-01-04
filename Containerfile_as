@@ -2,37 +2,33 @@
 #* pythonbuild
 #*----------------------------------------------------------------------
 
-FROM python:3.12-alpine as pythonbuild
+FROM docker.io/library/python:3.12-alpine as pythonbuild
 ARG ENABLE_TESTS
 WORKDIR /app
 COPY . /app
 
 RUN apk upgrade --no-cache && \
 apk add --no-cache zip && \
-ENABLE_TESTS=$ENABLE_TESTS ./etc/gen_run_pytests.sh
+ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=/app/pi-as/assembly/pi_digits_seed.ts ./etc/gen_run_pytests.sh
 
 #*----------------------------------------------------------------------
-#* zigbuild
+#* asbuild
 #*----------------------------------------------------------------------
-FROM alpine as zigbuild
+FROM docker.io/library/node:20-alpine as asbuild
 ARG ENABLE_TESTS
+
 WORKDIR /app
 COPY ./etc /app/etc
-COPY pi-zig /app
-COPY --from=pythonbuild /app/pi-zig/src/pi_digits_seed.zig src/pi_digits_seed.zig
+COPY pi-as /app
+COPY --from=pythonbuild /app/pi-as/assembly/pi_digits_seed.ts /app/assembly/pi_digits_seed.ts
 
-RUN ZIGVER=0.11.0 && ZIGARCH=zig-linux-x86_64-$ZIGVER.tar.xz && ZIGBIN=zig-bin && \
-apk upgrade --no-cache && \
-apk add --no-cache zip && \
-wget -O $ZIGARCH https://ziglang.org/download/$ZIGVER/$ZIGARCH && \
-tar xf $ZIGARCH && \
-ENABLE_TESTS=$ENABLE_TESTS ZIGARCH=$ZIGARCH ZIGBIN=$ZIGBIN ./etc/build_run_zig_tests.sh
+RUN ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=/app/assembly/pi_digits_seed.ts ./etc/build_run_as_tests.sh
 
 #*----------------------------------------------------------------------
 #* build
 #*----------------------------------------------------------------------
 
-FROM node:20-alpine as build
+FROM docker.io/library/node:20-alpine as build
 
 RUN apk upgrade --no-cache && \
 apk add --no-cache unzip
@@ -41,17 +37,18 @@ apk add --no-cache unzip
 
 WORKDIR /app
 COPY . /app
-COPY --from=zigbuild /app/zig-build* .
-COPY --from=zigbuild /app/zig-tests* .
-# used for integration testing pi-zig.wasm: execute `node public/pi-zig.js` in the container
-COPY --from=zigbuild /app/zig-out/lib/pi-zig.js ./public/pi-zig.js
-COPY --from=zigbuild /app/zig-out/lib/pi-zig.wasm ./public/pi-zig.wasm
+COPY --from=asbuild /app/as-*.* .
 
-COPY --from=pythonbuild /app/piadapter.zip .
-COPY --from=pythonbuild /app/python-tests.* .
+# used for integration testing pi-as.wasm: execute `node ./src/pi/pi-as-tester.js` in the container
+COPY --from=asbuild /app/pi-as-tester.js ./src/pi/pi-as-tester.js
+COPY --from=asbuild /app/build/pi-as.js ./src/pi/pi-as.js
+COPY --from=asbuild /app/build/pi-as.wasm ./src/pi/pi-as.wasm
+
+COPY --from=pythonbuild /app/piadapter.zip ./public/piadapter.zip
+COPY --from=pythonbuild /app/python-*.* .
 
 RUN npm install && \
-etc/clean_final.sh && \
+WASM_LANG=as etc/clean_final.sh && \
 rm -fr etc/
 
 ## Until I can work through the pyodide build issues ...
