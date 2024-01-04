@@ -3,8 +3,6 @@
 import logging
 from typing import Generator
 
-from .utils import pi_digits_writer_from_ext
-
 
 def pi_digit_generator(num_digits: int) -> Generator[int, None, None]:
     '''
@@ -62,6 +60,7 @@ if __name__ == '__main__':
 
     logging.info(f'Start writing to {sys.argv[1]}...')
 
+    from .utils import pi_digits_writer_from_ext
     writer = pi_digits_writer_from_ext(sys.argv[1])
 
     with open(sys.argv[1], 'w') as f:
