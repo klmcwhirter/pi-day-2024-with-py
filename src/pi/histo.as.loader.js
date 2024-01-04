@@ -11,7 +11,6 @@ export const loadOtherWasm = async () => {
     // Passing a unicode string across the JS to WASM boundary.
     const str = "Hello from AssemblyScript + JS + WASM with unicode ⚡!";
     pi_as.aslog(str);
-
 };
 
 export const loadHistograms = async (numbers) => {
