@@ -4,6 +4,7 @@
 
 - [Overview](#overview)
 - [Run it](#run-it)
+- [Run With Other WASM](#run-with-other-wasm)
 - [Why pyodide?](#why-pyodide)
 - [Why AssemblyScript?](#why-assemblyscript)
 - [Summary](#summary)
@@ -85,6 +86,21 @@ If you are uing the nix package manager with flakes enabled, then simply doing t
  Use `podman-compose down -t 0` to expedite the shutdown process. The default is to timeout in 10 secs.
 
  To clean up do `podman system prune -af`.
+
+## Run With Other WASM
+You will notice the reference to the WASM technology in [docker-compose.yml](./docker-compose.yml)
+
+```
+dockerfile: Containerfile_as
+```
+
+The `dockerfile` can be changed to any of these values:
+
+Value|Technology
+----|-------
+[Containerfile_as](./Containerfile_as)|[AssemblyScript](https://www.assemblyscript.org/introduction.html)
+[Containerfile_tinygo](./Containerfile_tinygo)|[TinyGO](https://tinygo.org/docs/guides/webassembly/wasm/)
+[Containerfile_zig](./Containerfile_zig)|[zig](https://ziglang.org/documentation/0.11.0/#Freestanding)
 
 ## Why pyodide?
 
