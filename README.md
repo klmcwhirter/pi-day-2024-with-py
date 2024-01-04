@@ -145,8 +145,7 @@ The Python code in the WASM component can do:
 
 WASM is great for CPU or I/O intensive operations. They execute at near native speeds.
 
-I have 3 implementations: [assemblyscript](./pi-as/) (as), [golang](./pi-tinygo/) (tinygo) and [zig](./pi-zig/). At the end of the day
-is is just Web Assembly - they perform similarly. Executing the histogram function in &lt; 1ms
+I have 3 implementations: [assemblyscript](./pi-as/) (as), [golang](./pi-tinygo/) (tinygo) and [zig](./pi-zig/). At the end of the day it is just Web Assembly - they perform similarly. Executing the histogram function in &lt; 1ms
 whereas pyodide takes multiple seconds per invocation. That is not Python's fault; just pyodide
 overhead.
 
