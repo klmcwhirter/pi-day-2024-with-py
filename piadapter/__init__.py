@@ -23,6 +23,7 @@ class PiAdapter:
     def __init__(self) -> None:
         self._cached_pi: list[int] = []
         self.histograms = []
+        self._version = None
 
     def __repr__(self) -> str:
         return 'PiAdapter()'
@@ -76,12 +77,19 @@ class PiAdapter:
         return [da for da in batched([int(digit) for digit in self._cached_pi[:num_digits]], n)]
 
     def version(self):
-        un = os.uname()
+        if not self._version:
+            python_ver = f'{sys.version}]'
 
-        return [
-            f'Python Version: {sys.version}',
-            f'Host Version: {un.sysname} {un.machine} {un.release}'
-        ]
+            os_uname = os.uname()
+            os_version = f'{os_uname.sysname} {os_uname.machine} {os_uname.release}'
+
+            self._version = [
+                f'Python: {python_ver}',
+                f'Host: {os_version}'
+            ]
+            logging.info(f'PiAdapter.version: {self._version}')
+
+        return self._version
 
 
 pia = PiAdapter()

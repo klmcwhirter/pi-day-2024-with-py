@@ -3,6 +3,7 @@
 ##### Table of Contents
 
 - [Overview](#overview)
+- [Branches](#branches)
 - [Run it](#run-it)
 - [Run With Other WASM](#run-with-other-wasm)
 - [Why pyodide?](#why-pyodide)
@@ -38,6 +39,28 @@ These are the main features represented by the screenshots below.
 > Please note that this is an absolutely useless architecture pattern. Don't use it!
 >
 > But it was fun to build and shows something else that is possible with WASM.
+
+## Branches
+This repo has multiple branches depicting different stages of development.
+
+Branch|Contains
+------|--------
+master|Most current development work
+without-pyodide|Removed all python, tinygo and zig code; single wasm produced by AssemblyScript; Python generates pi_digits_seed.ts during build. This is the most performant, but this is "Pi day with Py" so leaving Python in master ;)
+without-wasm|No wasm component at all; all in Typescript; Python generates pi_digits_seed.ts during build
+python-generated|State of code after moving to generate pi_30000.py as Python code
+python-only|Right before moving to generate pi_30000.py during build; all calcs still in Python
+
+### Features per branch
+The master branch has the most flexibility in that it allows technologies to be swapped by chnging the dockerfile reference in `docker-compose.yml`. But that option is not available in the other branches.
+
+Branch|Feature
+------|-------
+master|Containerfile_as, Containerfile_tinygo, Containerfile_zig
+without-pyodide|Containerfile
+without-wasm|Containerfile
+python-generated|Dockerfile
+python-only|Dockerfile
 
 ## Run it
 
