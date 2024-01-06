@@ -14,7 +14,7 @@
 - [References](./docs/references.md)
 
 ---
-![1536 digits of pi](./docs/pi-day-2024-digits.png)
+![1536 digits of pi](https://github.com/klmcwhirter/stuff/blob/master/pi-day-2024-as-demo.gif)
 ---
 
 ## Overview
@@ -43,16 +43,16 @@ These are the main features represented by the screenshots below.
 ## Branches
 This repo has multiple branches depicting different stages of development.
 
-Branch|Contains
-------|--------
-master|Most current development work
-without-pyodide|Removed all python, tinygo and zig code; single wasm produced by AssemblyScript; Python generates pi_digits_seed.ts during build. This is the most performant, but this is "Pi day with Py" so leaving Python in master ;)
-without-wasm|No wasm component at all; all in Typescript; Python generates pi_digits_seed.ts during build
-python-generated|State of code after moving to generate pi_30000.py as Python code
-python-only|Right before moving to generate pi_30000.py during build; all calcs still in Python
+Phase|Branch|Startup time|Contains
+:---:|------|:----------:|--------
+1|python-only|~20 secs|Right before moving to generate pi_30000.py during build; all calcs still in Python
+2|python-generated|~5 secs|State of code after moving to generate pi_30000.py as Python code
+3|master|~2-3 secs|Most current development work; this is "Pi day with Py" so leaving Python in master ;)
+4|without-pyodide|20ms-30ms|Removed all python, tinygo and zig code; single wasm produced by AssemblyScript; Python generates pi_digits_seed.ts during build
+5|without-wasm|10ms-20ms|No wasm component at all; all in Typescript; Python generates pi_digits_seed.ts during build
 
 ### Features per branch
-The master branch has the most flexibility in that it allows technologies to be swapped by chnging the dockerfile reference in `docker-compose.yml`. But that option is not available in the other branches.
+The master branch has the most flexibility in that it allows technologies to be swapped by changing the dockerfile reference in [`docker-compose.yml`](./docker-compose.yml). But that option is not available in the other branches.
 
 Branch|Feature
 ------|-------
