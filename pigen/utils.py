@@ -28,7 +28,7 @@ def _pi_digits_py_writer(f: TextIOWrapper, digits: list[int]):
 
 def _pi_digits_ts_writer(f: TextIOWrapper, digits: list[int]):
     print("// Automatically generated via python -m piadapter.pi_digits pi-as/assembly/pi_digits_seed.ts", file=f)
-    print('export const pi_digits_seed: u8[] = ', end='', file=f)
+    print('export const pi_digits_seed: number[] = ', end='', file=f)
     print(digits, end='', file=f)
     print(';', file=f)
 

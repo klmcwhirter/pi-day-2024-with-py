@@ -1,6 +1,6 @@
 import { Resource, createContext, createResource, useContext } from 'solid-js';
 
-import { PiAdapter, loadWasm } from './histo.loader';
+import { PiAdapter, loadPiAdapter } from './histo.loader';
 
 export class PiState {
   constructor(
@@ -11,8 +11,8 @@ export class PiState {
 const PiStateContext = createContext<PiState>();
 
 export const PiAdapterProvider = (props) => {
-  const [piAdapter] = createResource(loadWasm, {
-    initialValue: new PiAdapter([], 'Loading ...'),
+  const [piAdapter] = createResource(loadPiAdapter, {
+    initialValue: new PiAdapter(),
   });
 
   const piState = new PiState(piAdapter);

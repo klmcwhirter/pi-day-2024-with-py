@@ -6,10 +6,7 @@ rm -fr .containerignore
 rm -fr Containerfile*
 rm -fr conftest.py
 rm -fr create_venv
-rm -fr pi-as/
-rm -fr pi-tinygo/
-rm -fr pi-zig/
-rm -fr piadapter/
+rm -fr pigen/
 rm -fr prettier.config.cjs
 rm -fr pyproject.toml
 rm -fr requirements.*

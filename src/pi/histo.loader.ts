@@ -1,29 +1,38 @@
-import * as pi_as from './pi-as.js';
+import { pi_digits_seed } from './pi_digits_seed';
+
 import { batched, logJS } from './utils.js';
 
 
-type HistogramProvider = (number) => number[];
-
 export class PiAdapter {
-    _pi_digits: number[] = [];
+    _pi_digits: number[] = pi_digits_seed;
     _histograms: {} = null;
-    _histogramProvider: HistogramProvider;
     _version = '';
 
     constructor(
-        pi_digits: number[],
-        version: string
     ) {
-        this._pi_digits = pi_digits;
-        this._version = version;
     }
 
-    calcHistograms(numbers: number[], histogramProvider: HistogramProvider) {
+
+    calcHistogram(n: number): number[] {
+        logJS(`PiAdapter.histogram(${n})`);
+        const slice_of_pi: number[] = pi_digits_seed.slice(0, n);
+        const slice_of_pi_len = slice_of_pi.length;
+
+        const rc: number[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        for (let i: number = 0; i < slice_of_pi_len; i++) {
+            rc[slice_of_pi[i]]++;
+        }
+
+        return rc;
+    }
+
+    calcHistograms(numbers: number[]) {
         logJS('PiAdapter.calcHistograms: Start calc-ing histograms...');
+
         if (!this._histograms) {
             this._histograms = {};
             for (let i = 0; i < numbers.length; i++) {
-                const histogram = histogramProvider(numbers[i]);
+                const histogram = this.calcHistogram(numbers[i]);
                 if (histogram) {
                     this._histograms[numbers[i]] = histogram;
                 }
@@ -59,21 +68,13 @@ export class PiAdapter {
     }
 }
 
-export const loadWasm = async (_load: boolean): Promise<PiAdapter> => {
-    logJS('loadWasm: loading WASM ...');
+export const loadPiAdapter = async (_load: boolean): Promise<PiAdapter> => {
+    logJS('loadPiAdapter: loading ...');
 
-    const histo_pi_digits = pi_as.pi_digits();
-    const histo_histogram = pi_as.histogram;
-    const histo_version = pi_as.version();
+    const piAdapter = new PiAdapter();
+    piAdapter.calcHistograms(WELL_KNOWN_NUMS.toReversed());
 
-    const piAdapter = new PiAdapter(histo_pi_digits, histo_version);
-    piAdapter.calcHistograms(WELL_KNOWN_NUMS.toReversed(), histo_histogram);
-
-    // Passing a unicode string across the JS to WASM boundary.
-    const str = "Hello from AssemblyScript + JS + WASM with unicode ⚡!";
-    pi_as.aslog(str);
-
-    logJS('loadWasm: loading WASM ... done');
+    logJS('loadPiAdapter: loading ... done');
 
     return piAdapter;
 };

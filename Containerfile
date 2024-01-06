@@ -9,20 +9,7 @@ COPY . /app
 
 RUN apk upgrade --no-cache && \
 apk add --no-cache zip && \
-ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=/app/pi-as/assembly/pi_digits_seed.ts ./etc/gen_pi_digits.sh
-
-#*----------------------------------------------------------------------
-#* asbuild
-#*----------------------------------------------------------------------
-FROM docker.io/library/node:20-alpine as asbuild
-ARG ENABLE_TESTS
-
-WORKDIR /app
-COPY ./etc /app/etc
-COPY pi-as /app
-COPY --from=pythonbuild /app/pi-as/assembly/pi_digits_seed.ts /app/assembly/pi_digits_seed.ts
-
-RUN ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=/app/assembly/pi_digits_seed.ts ./etc/build_run_as_tests.sh
+ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=/app/src/pi/pi_digits_seed.ts ./etc/gen_pi_digits.sh
 
 #*----------------------------------------------------------------------
 #* build
@@ -37,13 +24,8 @@ apk add --no-cache unzip
 
 WORKDIR /app
 COPY . /app
-COPY --from=asbuild /app/as-*.* .
 
-# used for integration testing pi-as.wasm: execute `node ./src/pi/pi-as-tester.js` in the container
-COPY --from=asbuild /app/pi-as-tester.js ./src/pi/pi-as-tester.js
-COPY --from=asbuild /app/build/pi-as.js ./src/pi/pi-as.js
-COPY --from=asbuild /app/build/pi-as.wasm ./src/pi/pi-as.wasm
-
+COPY --from=pythonbuild /app/src/pi/pi_digits_seed.ts /app/src/pi/pi_digits_seed.ts
 COPY --from=pythonbuild /app/python-*.* .
 
 RUN npm install && \
