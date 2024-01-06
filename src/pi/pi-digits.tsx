@@ -5,9 +5,9 @@ import {
   createSignal,
 } from 'solid-js';
 import { Bar } from '../components';
-import { usePiState } from './pi.context';
+import { usePiContext } from './pi.context';
 import { HistogramItemValues, HistogramValues } from './pi-digits.model';
-import { WELL_KNOWN_NUMS } from './pyodide.loader';
+import { WELL_KNOWN_NUMS } from './histo.loader';
 
 const ROWS = 32;
 const COLS = 48;
@@ -43,11 +43,11 @@ const shadow_pallette = [
 ];
 
 export const PiDigitsView: Component = (props) => {
-  const piState = usePiState();
+  const piContext = usePiContext();
 
   return (
     <div class='table h-full border-collapse bg-stone-100 align-middle'>
-      <For each={piState.piAdapter().pi_digits(NUM_DIGITS, COLS)}>
+      <For each={piContext.piAdapter()?.pi_digits(NUM_DIGITS, COLS)}>
         {(row) => (
           <div class='table-row'>
             <For each={row}>
@@ -67,10 +67,10 @@ export const PiDigitsView: Component = (props) => {
 };
 
 export const PiDigitsHistogram: Component = (props) => {
-  const piState = usePiState();
+  const piContext = usePiContext();
 
   const fetchHistogram = async (n: number): Promise<HistogramValues> => {
-    const numbers: number[] = piState.piAdapter().histogram(n);
+    const numbers: number[] = piContext.piAdapter().histogram(n);
     const items: HistogramItemValues[] = numbers.map(
       (v: number, i: number): HistogramItemValues =>
         new HistogramItemValues(i, v, pallette[i], shadow_pallette[i]),

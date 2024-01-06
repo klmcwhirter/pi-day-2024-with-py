@@ -9,7 +9,7 @@ COPY . /app
 
 RUN apk upgrade --no-cache && \
 apk add --no-cache zip && \
-ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=/app/pi-as/assembly/pi_digits_seed.ts ./etc/gen_run_pytests.sh
+ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=/app/pi-as/assembly/pi_digits_seed.ts ./etc/gen_pi_digits.sh
 
 #*----------------------------------------------------------------------
 #* asbuild
@@ -44,11 +44,11 @@ COPY --from=asbuild /app/pi-as-tester.js ./src/pi/pi-as-tester.js
 COPY --from=asbuild /app/build/pi-as.js ./src/pi/pi-as.js
 COPY --from=asbuild /app/build/pi-as.wasm ./src/pi/pi-as.wasm
 
-COPY --from=pythonbuild /app/piadapter.zip ./public/piadapter.zip
 COPY --from=pythonbuild /app/python-*.* .
 
 RUN npm install && \
-WASM_LANG=as etc/clean_final.sh && \
+npm test && \
+etc/clean_final.sh && \
 rm -fr etc/
 
 ## Until I can work through the pyodide build issues ...

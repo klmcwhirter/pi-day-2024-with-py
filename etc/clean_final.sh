@@ -1,15 +1,5 @@
 #!/bin/sh
 
-# copy correct loader in place
-if [ -z "$WASM_LANG" ]
-then
-    echo "WASM_LANG cannot be empty!"
-    exit 255
-fi
-
-echo cp src/pi/histo.${WASM_LANG}.loader.js src/pi/histo.loader.js
-cp src/pi/histo.${WASM_LANG}.loader.js src/pi/histo.loader.js
-
 # Clean up final image by deleting stuff not needed at runtime.
 
 rm -fr .containerignore

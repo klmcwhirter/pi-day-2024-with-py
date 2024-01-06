@@ -3,7 +3,7 @@ import { PiDigitsHistogram, PiDigitsView } from './pi/pi-digits';
 import { HistogramItemValues, HistogramValues } from './pi/pi-digits.model';
 import { AppStateEnum } from './App';
 import { ReadmeSnippet } from './ReadmeSnippet';
-import { usePiState } from './pi/pi.context';
+import { usePiContext } from './pi/pi.context';
 
 export const Bar = (props) => {
   const TOTAL_WIDTH = 32; // in rem
@@ -101,13 +101,13 @@ export const Header = (props) => {
 };
 
 export const NavSwitcher = (props) => {
-  const piState = usePiState();
+  const piContext = usePiContext();
   const [state] = props.state;
 
   return (
     <div class='col-span-2 col-start-2 mx-auto h-[89vh]'>
       <Show
-        when={piState.seeded()}
+        when={piContext.piAdapter()}
         fallback={
           <div class='m-28 rounded-lg bg-stone-300 p-28 text-blue-700 shadow-2xl shadow-blue-900'>
             <p class='text-6xl'>Loading lots of &pi; ...</p>
@@ -137,7 +137,7 @@ export const NavSwitcher = (props) => {
 };
 
 export const NavView = (props) => {
-  const piState = usePiState();
+  const piContext = usePiContext();
   const [state, setState] = props.state;
   const appStates = [AppStateEnum.DIGITS, AppStateEnum.HISTOGRAM];
 
@@ -148,7 +148,7 @@ export const NavView = (props) => {
           {(s) => (
             <li class='m-1 p-2 inline-block'>
               <button
-                disabled={!piState.seeded()}
+                disabled={!piContext.piAdapter()}
                 class='hover:disabled::cursor-auto m-2 block p-2 rounded-lg bg-emerald-50 text-lg text-blue-700
                 hover:cursor-pointer hover:rounded-lg hover:bg-emerald-700 hover:font-bold
                 hover:text-white disabled:rounded-lg disabled:bg-stone-300 disabled:text-stone-700'

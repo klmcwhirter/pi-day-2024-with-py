@@ -4,8 +4,8 @@ import timeit
 import pytest
 
 from conftest import TimeoutException, time_limit
-from piadapter import PiAdapter
-from piadapter.pi_digits import pi_digit_generator
+from pigen import PiAdapter
+from pigen.pi_digits import pi_digit_generator
 
 MAX_SECS = 30
 

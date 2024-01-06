@@ -16,13 +16,9 @@ then
 fi
 
 # Generate the pi digits cache module(s)
-echo python -m piadapter.pi_digits $PI_DIGITS_FILE
-python -m piadapter.pi_digits $PI_DIGITS_FILE
-rm -fr piadapter/__pycache__/ 2>&1 >/dev/null
-
-# Generate the pyodide module zip file
-rm -f piadapter.zip
-zip -r piadapter.zip piadapter/
+echo python -m pigen.pi_digits $PI_DIGITS_FILE
+python -m pigen.pi_digits $PI_DIGITS_FILE
+rm -fr pigen/__pycache__/ 2>&1 >/dev/null
 
 echo "ENABLE_TESTS=$ENABLE_TESTS" >pytest.out
 
