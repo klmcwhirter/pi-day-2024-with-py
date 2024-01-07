@@ -76,10 +76,10 @@ export class PiAdapter {
 }
 
 const loadPiadapter = async (pyodide) => {
-  // See etc/gen_run_pytests.sh where piadapter.zip is created. It is called from Containerfile.
-  let zipResponse = await fetch('piadapter.zip');
-  let zipBinary = await zipResponse.arrayBuffer();
-  await pyodide.unpackArchive(zipBinary, 'zip');
+  // See etc/gen_run_pytests.sh where piadapter.tgz is created. It is called from Containerfile.
+  let tgzResponse = await fetch('piadapter.tgz');
+  let tgzBinary = await tgzResponse.arrayBuffer();
+  await pyodide.unpackArchive(tgzBinary, 'gztar');
 
   const piadapterPkg = pyodide.pyimport('piadapter');
   return piadapterPkg.pia;

@@ -21,8 +21,8 @@ python -m piadapter.pi_digits $PI_DIGITS_FILE
 rm -fr piadapter/__pycache__/ 2>&1 >/dev/null
 
 # Generate the pyodide module zip file
-rm -f piadapter.zip
-zip -r piadapter.zip piadapter/
+rm -f piadapter.tgz
+tar czvf piadapter.tgz piadapter/
 
 echo "ENABLE_TESTS=$ENABLE_TESTS" >pytest.out
 

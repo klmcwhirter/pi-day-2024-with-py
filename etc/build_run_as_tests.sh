@@ -31,7 +31,8 @@ then
     exit 255
 fi
 
-npm install
+echo npm install 2>&1 | tee -a step.out
+npm install 2>&1 | tee -a step.out
 rm -fr ./build
 
 echo npm run asbuild:release 2>&1 | tee -a step.out
