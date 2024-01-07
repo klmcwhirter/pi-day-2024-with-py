@@ -31,5 +31,5 @@ export function pi_digits_len(): i32 {
 }
 
 export function version(): string {
-  return 'assemblyscript: 0.27.22';
+  return `assemblyscript: ${ASC_VERSION_MAJOR}.${ASC_VERSION_MINOR}.${ASC_VERSION_PATCH}`;
 }
