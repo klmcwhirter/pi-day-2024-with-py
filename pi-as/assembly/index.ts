@@ -10,9 +10,13 @@ export function aslog(str: string): void {
 }
 
 export function histogram(n: i32): i32[] {
-  consoleLog(`AS: histogram(${n})`);
-  const slice_of_pi: u8[] = pi_digits_seed.slice(0, n);
-  const slice_of_pi_len = slice_of_pi.length;
+  aslog(`histogram(${n})`);
+  const actual_len: i32 = pi_digits_seed.length;
+  const slice_of_pi_len: i32 = <i32>Math.min(actual_len, n);
+  if (slice_of_pi_len < n) {
+    aslog(`WARN: using ${slice_of_pi_len} instead of ${n}`);
+  }
+  const slice_of_pi: u8[] = pi_digits_seed.slice(0, slice_of_pi_len);
 
   const rc: i32[] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
   for (let i: i32 = 0; i < slice_of_pi_len; i++) {

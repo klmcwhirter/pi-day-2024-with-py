@@ -7,8 +7,7 @@ ARG ENABLE_TESTS
 WORKDIR /app
 COPY . /app
 
-RUN apk upgrade --no-cache && \
-apk add --no-cache zip && \
+RUN apk upgrade && \
 ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=/app/pi-as/assembly/pi_digits_seed.ts ./etc/gen_run_pytests.sh
 
 #*----------------------------------------------------------------------
@@ -22,8 +21,7 @@ COPY ./etc /app/etc
 COPY pi-as /app
 COPY --from=pythonbuild /app/pi-as/assembly/pi_digits_seed.ts /app/assembly/pi_digits_seed.ts
 
-RUN apk upgrade --no-cache && \
-apk add --no-cache zip && \
+RUN apk upgrade && \
 ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=/app/assembly/pi_digits_seed.ts ./etc/build_run_as_tests.sh
 
 #*----------------------------------------------------------------------
@@ -46,8 +44,7 @@ COPY --from=asbuild /app/build/pi-as.wasm ./src/pi/pi-as.wasm
 COPY --from=pythonbuild /app/piadapter.tgz ./public/piadapter.tgz
 COPY --from=pythonbuild /app/python-*.* .
 
-RUN apk upgrade --no-cache && \
-apk add --no-cache zip && \
+RUN apk upgrade && \
 npm install && \
 WASM_LANG=as etc/clean_final.sh && \
 rm -fr etc/

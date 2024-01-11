@@ -7,8 +7,7 @@ ARG ENABLE_TESTS
 WORKDIR /app
 COPY . /app
 
-RUN apk upgrade --no-cache && \
-apk add --no-cache zip && \
+RUN apk upgrade && \
 ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=/app/pi-tinygo/pi_digits_seed.go ./etc/gen_run_pytests.sh
 
 #*----------------------------------------------------------------------
@@ -32,8 +31,7 @@ ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=/app/pi_digits_seed.go.txt ./etc/build
 
 FROM docker.io/library/node:20-alpine as build
 
-RUN apk upgrade --no-cache && \
-apk add --no-cache unzip
+RUN apk upgrade
 
 # ENV TZ=PST8PDT set in docker-compose.yml
 
@@ -45,7 +43,7 @@ COPY --from=tgobuild /app/tinygo-tests* .
 COPY --from=tgobuild /app/pi-tinygo.js ./public/pi-tinygo.js
 COPY --from=tgobuild /app/pi-tinygo.wasm ./public/pi-tinygo.wasm
 
-COPY --from=pythonbuild /app/piadapter.zip ./public/piadapter.zip
+COPY --from=pythonbuild /app/piadapter.tgz ./public/piadapter.tgz
 COPY --from=pythonbuild /app/python-tests.* .
 
 RUN npm install && \

@@ -7,8 +7,7 @@ ARG ENABLE_TESTS
 WORKDIR /app
 COPY . /app
 
-RUN apk upgrade --no-cache && \
-apk add --no-cache zip && \
+RUN apk upgrade && \
 ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=/app/pi-zig/src/pi_digits_seed.zig ./etc/gen_run_pytests.sh
 
 #*----------------------------------------------------------------------
@@ -22,8 +21,7 @@ COPY pi-zig /app
 COPY --from=pythonbuild /app/pi-zig/src/pi_digits_seed.zig /app/src/pi_digits_seed.zig
 
 RUN ZIGVER=0.11.0 && ZIGARCH=zig-linux-x86_64-$ZIGVER.tar.xz && ZIGBIN=zig-bin && \
-apk upgrade --no-cache && \
-apk add --no-cache zip && \
+apk upgrade && \
 wget -O $ZIGARCH https://ziglang.org/download/$ZIGVER/$ZIGARCH && \
 tar xf $ZIGARCH && \
 ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=/app/src/pi_digits_seed.zig ZIGARCH=$ZIGARCH ZIGBIN=$ZIGBIN ./etc/build_run_zig_tests.sh
@@ -34,8 +32,7 @@ ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=/app/src/pi_digits_seed.zig ZIGARCH=$Z
 
 FROM docker.io/library/node:20-alpine as build
 
-RUN apk upgrade --no-cache && \
-apk add --no-cache unzip
+RUN apk upgrade
 
 # ENV TZ=PST8PDT set in docker-compose.yml
 
@@ -46,7 +43,7 @@ COPY --from=zigbuild /app/zig-*.* .
 COPY --from=zigbuild /app/src/pi-zig.js ./public/pi-zig.js
 COPY --from=zigbuild /app/zig-out/lib/pi-zig.wasm ./public/pi-zig.wasm
 
-COPY --from=pythonbuild /app/piadapter.zip ./public/piadapter.zip
+COPY --from=pythonbuild /app/piadapter.tgz ./public/piadapter.tgz
 COPY --from=pythonbuild /app/python-tests.* .
 
 RUN npm install && \
