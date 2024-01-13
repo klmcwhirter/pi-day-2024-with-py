@@ -1,5 +1,15 @@
 import * as pi_as from './pi-as.js';
-import { logJS } from './utils.js';
+import { logAS, logJS } from './utils.js';
+
+// hack until AssemblyScript allows customization with ESM bindings
+// console.trace just happens to be bound and we don't need it for tracing
+
+// See: https://www.assemblyscript.org/compiler.html#host-bindings
+// > These assumptions cannot be intercepted or customized since,
+// > to provide static ESM exports from the bindings file directly,
+// > instantiation must start immediately when the bindings file is imported.
+// > If customization is required, --bindings raw can be used instead.
+console.trace = logAS;
 
 export let histo_histogram, histo_pi_digits, histo_version;
 

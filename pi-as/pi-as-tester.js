@@ -1,8 +1,11 @@
 import * as pi_as from './pi-as.js';
 
+import { logAS } from "./utils.js";
+
 const N = 50000;
 
 const jsLog = (msg) => console.log('JS: %s', msg);
+console.trace = logAS;
 
 // Functions imported from WASM.
 let wasm_pi_digits, wasm_histogram, wasm_version;

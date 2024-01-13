@@ -34,6 +34,7 @@ then
 fi
 
 cat $PI_DIGITS_FILE >>./histo.go
+rm -f $PI_DIGITS_FILE
 
 echo tinygo build -target wasm --no-debug -opt=z -scheduler none -o pi-tinygo.wasm ./histo.go
 tinygo build -target wasm --no-debug -opt=z -scheduler none -o pi-tinygo.wasm ./histo.go 2>&1 | tee -a step.out

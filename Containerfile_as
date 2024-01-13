@@ -2,33 +2,36 @@
 #* pythonbuild
 #*----------------------------------------------------------------------
 
-FROM docker.io/library/python:3.12-alpine as pythonbuild
+FROM docker.io/library/python:3.12.1-alpine as pythonbuild
 ARG ENABLE_TESTS
+ARG PI_DIGITS_FILE=/app/assembly/pi_digits_seed.ts
 WORKDIR /app
 COPY . /app
 
-RUN apk upgrade && \
-ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=/app/pi-as/assembly/pi_digits_seed.ts ./etc/gen_run_pytests.sh
+RUN apk update && apk upgrade && \
+ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=$PI_DIGITS_FILE ./etc/gen_run_pytests.sh
 
 #*----------------------------------------------------------------------
 #* asbuild
 #*----------------------------------------------------------------------
 FROM docker.io/library/node:20-alpine as asbuild
 ARG ENABLE_TESTS
+ARG PI_DIGITS_FILE=/app/assembly/pi_digits_seed.ts
 
 WORKDIR /app
 COPY ./etc /app/etc
 COPY pi-as /app
-COPY --from=pythonbuild /app/pi-as/assembly/pi_digits_seed.ts /app/assembly/pi_digits_seed.ts
+COPY --from=pythonbuild $PI_DIGITS_FILE $PI_DIGITS_FILE
 
-RUN apk upgrade && \
-ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=/app/assembly/pi_digits_seed.ts ./etc/build_run_as_tests.sh
+RUN apk update && apk upgrade && \
+ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=$PI_DIGITS_FILE ./etc/build_run_as_tests.sh
 
 #*----------------------------------------------------------------------
 #* build
 #*----------------------------------------------------------------------
 
 FROM docker.io/library/node:20-alpine as build
+ARG ENABLE_TESTS
 
 # ENV TZ=PST8PDT set in docker-compose.yml
 
@@ -39,12 +42,12 @@ COPY --from=asbuild /app/as-*.* .
 # used for integration testing pi-as.wasm: execute `node ./src/pi/pi-as-tester.js` in the container
 COPY --from=asbuild /app/pi-as-tester.js ./src/pi/pi-as-tester.js
 COPY --from=asbuild /app/build/pi-as.js ./src/pi/pi-as.js
-COPY --from=asbuild /app/build/pi-as.wasm ./src/pi/pi-as.wasm
+COPY --from=asbuild /app/build/pi-as.wasm* ./src/pi/
 
 COPY --from=pythonbuild /app/piadapter.tgz ./public/piadapter.tgz
 COPY --from=pythonbuild /app/python-*.* .
 
-RUN apk upgrade && \
+RUN apk update && apk upgrade && \
 npm install && \
 WASM_LANG=as etc/clean_final.sh && \
 rm -fr etc/

@@ -1,7 +1,11 @@
 import assert from "node:assert";
 import test from "node:test";
 
+import { logAS } from "../build/utils.js";
+
 import { histogram } from "../build/pi-as.js";
+
+console.trace = logAS;
 
 const HISTO_FOR_50000 = [5033, 5054, 4867, 4948, 5011, 5052, 5018, 4977, 5030, 5010];
 

@@ -4,26 +4,28 @@
 
 FROM docker.io/library/python:3.12-alpine as pythonbuild
 ARG ENABLE_TESTS
+ARG PI_DIGITS_FILE=/app/pi_digits_seed.go
 WORKDIR /app
 COPY . /app
 
 RUN apk upgrade && \
-ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=/app/pi-tinygo/pi_digits_seed.go ./etc/gen_run_pytests.sh
+ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=$PI_DIGITS_FILE ./etc/gen_run_pytests.sh
 
 #*----------------------------------------------------------------------
 #* tgobuild
 #*----------------------------------------------------------------------
 FROM docker.io/tinygo/tinygo:0.30.0 as tgobuild
 ARG ENABLE_TESTS
+ARG PI_DIGITS_FILE=/app/pi_digits_seed.go
 USER tinygo:tinygo
 
 WORKDIR /app
 COPY ./etc /app/etc
 COPY pi-tinygo /app
-COPY --from=pythonbuild /app/pi-tinygo/pi_digits_seed.go /app/pi_digits_seed.go.txt
+COPY --from=pythonbuild $PI_DIGITS_FILE $PI_DIGITS_FILE
 
 RUN sudo chown -R tinygo:tinygo /app && \
-ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=/app/pi_digits_seed.go.txt ./etc/build_run_tgo_tests.sh
+ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=$PI_DIGITS_FILE ./etc/build_run_tgo_tests.sh
 
 #*----------------------------------------------------------------------
 #* build

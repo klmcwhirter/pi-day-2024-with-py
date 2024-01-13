@@ -50,3 +50,4 @@ So I cannot recommend this language (yet) for anything serious.
 
 ### pytest customization
 
+### nixos and nix

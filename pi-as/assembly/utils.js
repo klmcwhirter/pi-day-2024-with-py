@@ -6,5 +6,4 @@ export const current_time = () => {
 
 export const logAS = (msg) => console.log(`AS: ${current_time()} ${msg}`);
 
-
 export const logJS = (msg) => console.log(`JS: ${current_time()} ${msg}`);

@@ -13,6 +13,7 @@ cp src/pi/histo.${WASM_LANG}.loader.js src/pi/histo.loader.js
 # Clean up final image by deleting stuff not needed at runtime.
 
 rm -fr .containerignore
+rm -fr .dockerignore
 rm -fr Containerfile*
 rm -fr conftest.py
 rm -fr create_venv

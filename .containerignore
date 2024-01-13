@@ -8,6 +8,7 @@
 docs/
 /flake*
 /go.work
+/node_modules/
 tmp/
 **/*.md
 **/*.png

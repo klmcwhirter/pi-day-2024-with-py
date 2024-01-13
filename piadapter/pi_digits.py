@@ -51,19 +51,21 @@ if __name__ == '__main__':
     import sys
 
     if len(sys.argv) < 2:
-        print('Usage: python -m piadapter.pi_digits filename.ext\nwhere ext is one of go, py, zig')
+        print('Usage: python -m piadapter.pi_digits filename.ext\nwhere ext is one of go, js, py, ts, zig')
         sys.exit(1)
 
     logging.info('Start generating 50_000 digits of pi ...')
     digits = [d for d in pi_digit_generator(50_000)]
     logging.info('Done generating 50_000 digits of pi')
 
-    logging.info(f'Start writing to {sys.argv[1]}...')
-
     from .utils import pi_digits_writer_from_ext
-    writer = pi_digits_writer_from_ext(sys.argv[1])
 
-    with open(sys.argv[1], 'w') as f:
-        writer(f, digits)
+    for file_path in sys.argv[1:]:
+        logging.info(f'Start writing to {file_path}...')
 
-    logging.info(f'Done writing to {sys.argv[1]}.')
+        writer = pi_digits_writer_from_ext(file_path)
+
+        with open(file_path, 'w') as f:
+            writer(f, digits)
+
+        logging.info(f'Done writing to {file_path}.')

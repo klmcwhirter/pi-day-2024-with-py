@@ -14,8 +14,6 @@
 
 - [CPython Tools/wasm](https://github.com/python/cpython/tree/main/Tools/wasm)
 
-- [FORK of CPython - Tools/wasm](https://github.com/klmcwhirter/cpython/tree/main/Tools/wasm)
-
 - ["What can't WebAssembly do?" - Katie Bell (PyCon AU 2023)](https://youtu.be/JbZAsSzzk0E?si=qPbdAMYjSy4bMRzj)
 - [Porting Python to WebAssembly - Christian Heimes, Red Hat](https://youtu.be/B52cSnNOrFM?si=rQMe3HJooin0Zn1Z)
 
@@ -39,3 +37,8 @@
 
 - [Pygbag on github](https://github.com/pygame-web/pygbag)
 - [Export Python pygame Game to Web with WebAssembly (pygbag tutorial)](https://youtu.be/q25i2CCNvis?si=djk6J5DZuRiiZatD)
+
+---
+
+- [Dockerfile: From Start to Optimized (DockerCon 2023)](https://youtu.be/saSJa9YVroA)
+- [Docker: Wasm workloads (Beta)](https://docs.docker.com/desktop/wasm/)

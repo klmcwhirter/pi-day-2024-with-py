@@ -17,11 +17,17 @@ def _pi_digits_go_writer(f: TextIOWrapper, digits: list[int]):
     print(', '.join(str(d) for d in digits), end='', file=f)
     print('};', file=f)
 
+def _pi_digits_js_writer(f: TextIOWrapper, digits: list[int]):
+    print("// Automatically generated via python -m piadapter.pi_digits pi-as/benchmarks/pi_digits_seed.js", file=f)
+    print('export const pi_digits_seed = ', end='', file=f)
+    print(digits, end='', file=f)
+    print(';', file=f)
+
 
 def _pi_digits_py_writer(f: TextIOWrapper, digits: list[int]):
     print("'''Automatically generated via python -m piadapter.pi_digits piadapter/pi_digits_seed.py'''", file=f)
     print('# region', file=f)
-    print('pi_digits_30000 = ', end='', file=f)
+    print('pi_digits_seed = ', end='', file=f)
     print(digits, file=f)
     print('# endregion', file=f)
 
@@ -49,6 +55,8 @@ def pi_digits_writer_from_ext(filepath: str):
         match file_parts:
             case (_, '.go'):
                 return _pi_digits_go_writer
+            case (_, '.js'):
+                return _pi_digits_js_writer
             case (_, '.py'):
                 return _pi_digits_py_writer
             case (_, '.ts'):

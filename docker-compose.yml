@@ -11,5 +11,7 @@ services:
       args:
         ENABLE_TESTS: 0
       dockerfile: Containerfile_as
+      # dockerfile: Containerfile_tinygo
+      # dockerfile: Containerfile_zig
     deploy:
       replicas: 1

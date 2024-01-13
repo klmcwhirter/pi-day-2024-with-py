@@ -51,7 +51,7 @@ mv ${zig_dir} $ZIGBIN 2>&1 | tee -a step.out
 echo "ENABLE_TESTS=$ENABLE_TESTS" | tee -a step.out
 if [ "$ENABLE_TESTS" = "1" ]
 then
-    echo ${ZIGBIN}/zig build test -Dwasm=false --summary all -Doptimize=Debug --verbose
+    echo ${ZIGBIN}/zig build test -Dwasm=false --summary all -Doptimize=Debug --verbose 2>&1 | tee -a step.out
     ${ZIGBIN}/zig build test -Dwasm=false --summary all -Doptimize=Debug --verbose 2>&1 | tee -a step.out
     rc=$?
     echo test rc=${rc}

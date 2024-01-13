@@ -4,27 +4,29 @@
 
 FROM docker.io/library/python:3.12-alpine as pythonbuild
 ARG ENABLE_TESTS
+ARG PI_DIGITS_FILE=/app/src/pi_digits_seed.zig
 WORKDIR /app
 COPY . /app
 
 RUN apk upgrade && \
-ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=/app/pi-zig/src/pi_digits_seed.zig ./etc/gen_run_pytests.sh
+ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=$PI_DIGITS_FILE ./etc/gen_run_pytests.sh
 
 #*----------------------------------------------------------------------
 #* zigbuild
 #*----------------------------------------------------------------------
 FROM docker.io/library/alpine as zigbuild
 ARG ENABLE_TESTS
+ARG PI_DIGITS_FILE=/app/src/pi_digits_seed.zig
 WORKDIR /app
 COPY ./etc /app/etc
 COPY pi-zig /app
-COPY --from=pythonbuild /app/pi-zig/src/pi_digits_seed.zig /app/src/pi_digits_seed.zig
+COPY --from=pythonbuild $PI_DIGITS_FILE $PI_DIGITS_FILE
 
 RUN ZIGVER=0.11.0 && ZIGARCH=zig-linux-x86_64-$ZIGVER.tar.xz && ZIGBIN=zig-bin && \
 apk upgrade && \
 wget -O $ZIGARCH https://ziglang.org/download/$ZIGVER/$ZIGARCH && \
 tar xf $ZIGARCH && \
-ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=/app/src/pi_digits_seed.zig ZIGARCH=$ZIGARCH ZIGBIN=$ZIGBIN ./etc/build_run_zig_tests.sh
+ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=$PI_DIGITS_FILE ZIGARCH=$ZIGARCH ZIGBIN=$ZIGBIN ./etc/build_run_zig_tests.sh
 
 #*----------------------------------------------------------------------
 #* build
@@ -38,7 +40,8 @@ RUN apk upgrade
 
 WORKDIR /app
 COPY . /app
-COPY --from=zigbuild /app/zig-*.* .
+COPY --from=zigbuild /app/zig-build.* .
+COPY --from=zigbuild /app/zig-tests.* .
 # used for integration testing pi-zig.wasm: execute `node public/pi-zig.js` in the container
 COPY --from=zigbuild /app/src/pi-zig.js ./public/pi-zig.js
 COPY --from=zigbuild /app/zig-out/lib/pi-zig.wasm ./public/pi-zig.wasm
