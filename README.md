@@ -173,21 +173,20 @@ The result may not seem earth shattering on the surface, but I am blown away.
 
 The Python code in the WASM component can do:
 
-- NOT data crunching (data science libraries e.g., numpy, pandas, etc. come built into pyodide) - even though I am not using them on purpose, and not much can be done really - see [Downsides](./docs/wasm-downsides.md)
+- in theory, data crunching (data science libraries e.g., numpy, pandas, etc. come built into pyodide) - even though I am not using them on purpose, but not much can be done in the browser with them really - see [Downsides](./docs/wasm-downsides.md)
 - NOT make API calls
 - use Python skilled resources on the team more where it make sense to do so
-- leverage the more expressive nature of Python vs JavaScript to get the job done in a more maintainable way
+- leverage the more expressive nature of Python vs JavaScript to get the job done in a more maintainable way (although this is debatable in my final analysis)
 - keep the very mature UI workflows using vite, webpack, etc. in place
 - expand (dare I say muddy the waters of) the conversation about a distributed presentation layer some more
-- nodejs, SSR, now rust - WASM is a natural addition to the distributed presentation discussion whether it be client or server side (as you will find readily available commentary)
+- nodejs, SSR, now rust, go, zig, etc. - WASM is a natural addition to the distributed presentation discussion whether it be client or server side (as you will find readily available commentary)
 - integrating with other WASM components that will become available as things mature
 
-WASM is great for CPU or I/O intensive operations. They execute at near native speeds.
+WASM components are great for CPU or I/O intensive operations. They execute at near native speeds.
 
-I have 3 implementations: [assemblyscript](./pi-as/) (as), [golang](./pi-tinygo/) (tinygo) and [zig](./pi-zig/). At the end of the day it is just Web Assembly - they perform similarly. Executing the histogram function in &lt; 1ms
-whereas pyodide takes multiple seconds per invocation. That is not Python's fault; just pyodide
-overhead.
+I have 3 implementations: [assemblyscript](./pi-as/) (as), [golang](./pi-tinygo/) (tinygo) and [zig](./pi-zig/). At the end of the day it is just Web Assembly - they perform similarly; executing the histogram function in &lt; 1ms
+whereas pyodide takes multiple seconds per invocation. That is not necessarily Python's fault; just pyodide overhead.
 
 Here I only pursue client side - because it was fun to do and I was curious.
 
-After all, pi day is about celebrating PI in any ludracous way imaginable (not just from a mathematical perspective) and, in my case, practicing the skills of my craft.
+After all, pi day is about celebrating PI in any ludicrous way imaginable (not just from a mathematical perspective) and, in my case, practicing the skills of my craft.
