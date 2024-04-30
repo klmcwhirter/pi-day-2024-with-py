@@ -2,19 +2,19 @@
 #* pythonbuild
 #*----------------------------------------------------------------------
 
-FROM docker.io/library/python:3.12.1-alpine as pythonbuild
+FROM docker.io/library/python:3.12.3-alpine as pythonbuild
 ARG ENABLE_TESTS
 ARG PI_DIGITS_FILE=/app/assembly/pi_digits_seed.ts
 WORKDIR /app
 COPY . /app
 
 RUN apk update && apk upgrade && \
-ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=$PI_DIGITS_FILE ./etc/gen_run_pytests.sh
+    ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=$PI_DIGITS_FILE ./etc/gen_run_pytests.sh
 
 #*----------------------------------------------------------------------
 #* asbuild
 #*----------------------------------------------------------------------
-FROM docker.io/library/node:20-alpine as asbuild
+FROM docker.io/library/node:22-alpine as asbuild
 ARG ENABLE_TESTS
 ARG PI_DIGITS_FILE=/app/assembly/pi_digits_seed.ts
 
@@ -24,13 +24,13 @@ COPY pi-as /app
 COPY --from=pythonbuild $PI_DIGITS_FILE $PI_DIGITS_FILE
 
 RUN apk update && apk upgrade && \
-ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=$PI_DIGITS_FILE ./etc/build_run_as_tests.sh
+    ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=$PI_DIGITS_FILE ./etc/build_run_as_tests.sh
 
 #*----------------------------------------------------------------------
 #* build
 #*----------------------------------------------------------------------
 
-FROM docker.io/library/node:20-alpine as build
+FROM docker.io/library/node:22-alpine as build
 ARG ENABLE_TESTS
 
 # ENV TZ=PST8PDT set in docker-compose.yml
@@ -49,8 +49,8 @@ COPY --from=pythonbuild /app/python-*.* .
 
 RUN apk update && apk upgrade && \
 npm install && \
-WASM_LANG=as etc/clean_final.sh && \
-rm -fr etc/
+    WASM_LANG=as etc/clean_final.sh && \
+    rm -fr etc/
 
 ## Until I can work through the pyodide build issues ...
 EXPOSE 3000

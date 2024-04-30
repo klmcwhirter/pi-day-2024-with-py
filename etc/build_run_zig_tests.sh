@@ -30,7 +30,7 @@ then
     echo "PI_DIGITS_FILE cannot be empty and file must exist" | tee -a step.out
 
     clean_up 255 ${ZIG_BUILD}
-    echo "tinygo build failed" >${ZIG_TESTS}.skipped
+    echo "zig build failed" >${ZIG_TESTS}.skipped
     exit 255
 fi
 
@@ -66,6 +66,7 @@ echo ${ZIGBIN}/zig build copy-js --summary all -Dwasm --verbose
 ${ZIGBIN}/zig build copy-js --summary all -Dwasm --verbose 2>&1 | tee -a step.out
 rc=$?
 echo build rc=${rc}
+
 if [ $rc -ne 0 ];then
     clean_up $rc ${ZIG_BUILD}
     echo "zig build failed" >${ZIG_TESTS}.skipped

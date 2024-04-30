@@ -23,6 +23,8 @@ fi
 # Generate the pi digits cache module(s)
 echo python -m piadapter.pi_digits $PI_DIGITS_FILE 2>&1 | tee -a step.out
 python -m piadapter.pi_digits $PI_DIGITS_FILE 2>&1 | tee -a step.out
+[ ! -f $PI_DIGITS_FILE ] && exit 2
+
 rm -fr piadapter/__pycache__/ 2>&1 >/dev/null
 
 # Generate the pyodide module zip file

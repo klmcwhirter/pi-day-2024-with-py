@@ -2,19 +2,19 @@
 #* pythonbuild
 #*----------------------------------------------------------------------
 
-FROM docker.io/library/python:3.12-alpine as pythonbuild
+FROM docker.io/library/python:3.12.3-alpine as pythonbuild
 ARG ENABLE_TESTS
 ARG PI_DIGITS_FILE=/app/pi_digits_seed.go
 WORKDIR /app
 COPY . /app
 
 RUN apk upgrade && \
-ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=$PI_DIGITS_FILE ./etc/gen_run_pytests.sh
+    ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=$PI_DIGITS_FILE ./etc/gen_run_pytests.sh
 
 #*----------------------------------------------------------------------
 #* tgobuild
 #*----------------------------------------------------------------------
-FROM docker.io/tinygo/tinygo:0.30.0 as tgobuild
+FROM docker.io/tinygo/tinygo:0.31.2 as tgobuild
 ARG ENABLE_TESTS
 ARG PI_DIGITS_FILE=/app/pi_digits_seed.go
 USER tinygo:tinygo
@@ -25,13 +25,13 @@ COPY pi-tinygo /app
 COPY --from=pythonbuild $PI_DIGITS_FILE $PI_DIGITS_FILE
 
 RUN sudo chown -R tinygo:tinygo /app && \
-ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=$PI_DIGITS_FILE ./etc/build_run_tgo_tests.sh
+    ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=$PI_DIGITS_FILE ./etc/build_run_tgo_tests.sh
 
 #*----------------------------------------------------------------------
 #* build
 #*----------------------------------------------------------------------
 
-FROM docker.io/library/node:20-alpine as build
+FROM docker.io/library/node:22-alpine as build
 
 RUN apk upgrade
 
@@ -41,16 +41,16 @@ WORKDIR /app
 COPY . /app
 COPY --from=tgobuild /app/tinygo-build* .
 COPY --from=tgobuild /app/tinygo-tests* .
-# used for integration testing pi-tinygo.wasm: execute `node public/pi-tinygo.js` in the container
-COPY --from=tgobuild /app/pi-tinygo.js ./public/pi-tinygo.js
+# used for integration testing pi-tinygo.wasm: execute `node public/pi-tinygo.cjs` in the container
+COPY --from=tgobuild /app/pi-tinygo.cjs ./public/pi-tinygo.cjs
 COPY --from=tgobuild /app/pi-tinygo.wasm ./public/pi-tinygo.wasm
 
 COPY --from=pythonbuild /app/piadapter.tgz ./public/piadapter.tgz
 COPY --from=pythonbuild /app/python-tests.* .
 
 RUN npm install && \
-WASM_LANG=tinygo etc/clean_final.sh && \
-rm -fr etc/
+    WASM_LANG=tinygo etc/clean_final.sh && \
+    rm -fr etc/
 
 ## Until I can work through the pyodide build issues ...
 EXPOSE 3000

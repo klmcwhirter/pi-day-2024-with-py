@@ -12,25 +12,63 @@ pub fn build(b: *std.Build) void {
     const is_wasm = b.option(bool, "wasm", "build for wasm") orelse false;
     // Now we can make a build decision based on that option.
 
+    // This adds a command line option to zig build via the -D flag. i.e. -Dwasi
+    const is_wasi = b.option(bool, "wasi", "build for wasi else freestanding") orelse false;
+
     const runtimeName = "runtime";
     const runtimeFile = if (is_wasm) "src/wasm_runtime.zig" else "src/zig_runtime.zig";
-    const runtime = b.addModule(runtimeName, .{ .source_file = .{ .path = runtimeFile } });
+    const runtime = .{ .root_source_file = .{ .path = runtimeFile } };
 
     if (is_wasm) {
-        artifact = b.addSharedLibrary(.{
-            .name = "pi-zig",
-            .root_source_file = .{ .path = "src/histo.zig" },
-            .target = .{ .cpu_arch = .wasm32, .os_tag = .wasi },
-            // .target = .{ .cpu_arch = .wasm32, .os_tag = .freestanding },
-            .optimize = .ReleaseSmall,
-        });
-        artifact.rdynamic = true;
+        const os_tag: std.Target.Os.Tag = if (is_wasi) .wasi else .freestanding;
+
+        const wasm_target = b.resolveTargetQuery(.{ .cpu_arch = .wasm32, .os_tag = os_tag });
+
+        if (is_wasi) {
+            artifact = b.addSharedLibrary(.{ //
+                .name = "pi-zig",
+                .root_source_file = .{ .path = "src/histo.zig" },
+                .target = wasm_target,
+                .optimize = .ReleaseSmall,
+                .use_lld = false,
+                .use_llvm = false,
+                .link_libc = false,
+            });
+            artifact.rdynamic = true;
+            artifact.export_memory = true;
+            // artifact.export_table = true;
+        } else {
+            artifact = b.addExecutable(.{ //
+                .name = "pi-zig",
+                .root_source_file = .{ .path = "src/histo.zig" },
+                .target = wasm_target,
+                .optimize = .ReleaseSmall,
+                .use_lld = false,
+                .use_llvm = false,
+                .link_libc = false,
+            });
+            artifact.entry = .disabled;
+            artifact.rdynamic = true;
+            // artifact.export_symbol_names = &.{ "histogram", "pi_digits", "pi_digits_len", "alloc", "free", "memory", "zlog", "zig_version" };
+            // artifact.import_memory = false;
+            // artifact.export_memory = true;
+            // artifact.initial_memory = 16 * 64 * 1024;
+            // artifact.max_memory = 20 * 64 * 1024;
+            // artifact.import_table = false;
+            // artifact.export_table = true;
+        }
+
+        const install_dir: std.Build.InstallDir = switch (artifact.kind) {
+            .exe => .bin,
+            .lib => .lib,
+            else => .bin,
+        };
 
         const wat = b.addSystemCommand(&[_][]const u8{
             "wasm2wat",
-            b.getInstallPath(.lib, "pi-zig.wasm"),
+            b.getInstallPath(install_dir, "pi-zig.wasm"),
             "-o",
-            b.getInstallPath(.lib, "pi-zig.wat"),
+            b.getInstallPath(install_dir, "pi-zig.wat"),
         });
         wat.step.dependOn(b.getInstallStep());
 
@@ -40,8 +78,8 @@ pub fn build(b: *std.Build) void {
 
         const copy_js = b.addSystemCommand(&[_][]const u8{
             "cp",
-            "src/pi-zig.js",
-            b.getInstallPath(.lib, "pi-zig.js"),
+            "src/pi-zig.cjs",
+            b.getInstallPath(install_dir, "pi-zig.cjs"),
         });
         copy_js.step.dependOn(b.getInstallStep());
 
@@ -49,26 +87,30 @@ pub fn build(b: *std.Build) void {
         const copy_js_step = b.step("copy-js", "Copy the js script used for testing");
         copy_js_step.dependOn(&copy_js.step);
     } else {
-        artifact = b.addExecutable(.{
+        artifact = b.addExecutable(.{ //
             .name = "pi-zig",
             .root_source_file = .{ .path = "src/main.zig" },
             .target = target,
             .optimize = optimize,
+            .single_threaded = true,
+            .use_lld = false,
+            .use_llvm = false,
         });
-        artifact.single_threaded = true;
     }
-    artifact.addModule(runtimeName, runtime);
+    artifact.root_module.addAnonymousImport(runtimeName, runtime);
 
     b.installArtifact(artifact);
 
     // Creates a step for unit testing. This only builds the test executable
     // but does not run it.
-    const unit_tests = b.addTest(.{
+    const unit_tests = b.addTest(.{ //
         .root_source_file = .{ .path = "src/main.zig" },
         .target = target,
         .optimize = optimize,
+        .use_lld = false,
+        .use_llvm = false,
     });
-    unit_tests.addModule(runtimeName, runtime);
+    unit_tests.root_module.addAnonymousImport(runtimeName, runtime);
 
     const run_unit_tests = b.addRunArtifact(unit_tests);
 

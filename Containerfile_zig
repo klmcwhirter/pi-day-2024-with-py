@@ -2,14 +2,14 @@
 #* pythonbuild
 #*----------------------------------------------------------------------
 
-FROM docker.io/library/python:3.12-alpine as pythonbuild
+FROM docker.io/library/python:3.12.3-alpine as pythonbuild
 ARG ENABLE_TESTS
 ARG PI_DIGITS_FILE=/app/src/pi_digits_seed.zig
 WORKDIR /app
 COPY . /app
 
 RUN apk upgrade && \
-ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=$PI_DIGITS_FILE ./etc/gen_run_pytests.sh
+    ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=$PI_DIGITS_FILE ./etc/gen_run_pytests.sh
 
 #*----------------------------------------------------------------------
 #* zigbuild
@@ -22,11 +22,15 @@ COPY ./etc /app/etc
 COPY pi-zig /app
 COPY --from=pythonbuild $PI_DIGITS_FILE $PI_DIGITS_FILE
 
-RUN ZIGVER=0.11.0 && ZIGARCH=zig-linux-x86_64-$ZIGVER.tar.xz && ZIGBIN=zig-bin && \
-apk upgrade && \
-wget -O $ZIGARCH https://ziglang.org/download/$ZIGVER/$ZIGARCH && \
-tar xf $ZIGARCH && \
-ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=$PI_DIGITS_FILE ZIGARCH=$ZIGARCH ZIGBIN=$ZIGBIN ./etc/build_run_zig_tests.sh
+# RUN ZIGVER=0.11.0 && ZIGARCH=zig-linux-x86_64-$ZIGVER.tar.xz && ZIGBIN=zig-bin && \
+
+RUN ZIGVER=0.12.0 && ZIGARCH=zig-linux-x86_64-$ZIGVER.tar.xz && ZIGBIN=zig-bin && \
+    apk upgrade && \
+    apk add binaryen && \
+    wget -O $ZIGARCH https://ziglang.org/download/$ZIGVER/$ZIGARCH && \
+    tar xf $ZIGARCH && \
+    ENABLE_TESTS=$ENABLE_TESTS PI_DIGITS_FILE=$PI_DIGITS_FILE ZIGARCH=$ZIGARCH ZIGBIN=$ZIGBIN ./etc/build_run_zig_tests.sh && \
+    wasm-dis zig-out/bin/pi-zig.wasm -o zig-out/bin/pi-zig.wat
 
 #*----------------------------------------------------------------------
 #* build
@@ -42,16 +46,17 @@ WORKDIR /app
 COPY . /app
 COPY --from=zigbuild /app/zig-build.* .
 COPY --from=zigbuild /app/zig-tests.* .
-# used for integration testing pi-zig.wasm: execute `node public/pi-zig.js` in the container
-COPY --from=zigbuild /app/src/pi-zig.js ./public/pi-zig.js
-COPY --from=zigbuild /app/zig-out/lib/pi-zig.wasm ./public/pi-zig.wasm
+# used for integration testing pi-zig.wasm: execute `node public/pi-zig.cjs` in the container
+COPY --from=zigbuild /app/zig-out/bin/pi-zig.cjs ./public/pi-zig.cjs
+COPY --from=zigbuild /app/zig-out/bin/pi-zig.wasm ./public/pi-zig.wasm
+COPY --from=zigbuild /app/zig-out/bin/pi-zig.wat ./public/pi-zig.wat
 
 COPY --from=pythonbuild /app/piadapter.tgz ./public/piadapter.tgz
 COPY --from=pythonbuild /app/python-tests.* .
 
 RUN npm install && \
-WASM_LANG=zig etc/clean_final.sh && \
-rm -fr etc/
+    WASM_LANG=zig etc/clean_final.sh && \
+    rm -fr etc/
 
 ## Until I can work through the pyodide build issues ...
 EXPOSE 3000
