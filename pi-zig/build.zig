@@ -16,8 +16,8 @@ pub fn build(b: *std.Build) void {
     const is_wasi = b.option(bool, "wasi", "build for wasi else freestanding") orelse false;
 
     const runtimeName = "runtime";
-    const runtimeFile = if (is_wasm) "src/wasm_runtime.zig" else "src/zig_runtime.zig";
-    const runtime = .{ .root_source_file = .{ .path = runtimeFile } };
+    const runtimeFile = if (is_wasm) b.path("src/wasm_runtime.zig") else b.path("src/zig_runtime.zig");
+    const runtime: std.Build.Module.CreateOptions = .{ .root_source_file = runtimeFile };
 
     if (is_wasm) {
         const os_tag: std.Target.Os.Tag = if (is_wasi) .wasi else .freestanding;
@@ -27,7 +27,7 @@ pub fn build(b: *std.Build) void {
         if (is_wasi) {
             artifact = b.addSharedLibrary(.{ //
                 .name = "pi-zig",
-                .root_source_file = .{ .path = "src/histo.zig" },
+                .root_source_file = b.path("src/histo.zig"),
                 .target = wasm_target,
                 .optimize = .ReleaseSmall,
                 .use_lld = false,
@@ -40,7 +40,7 @@ pub fn build(b: *std.Build) void {
         } else {
             artifact = b.addExecutable(.{ //
                 .name = "pi-zig",
-                .root_source_file = .{ .path = "src/histo.zig" },
+                .root_source_file = b.path("src/histo.zig"),
                 .target = wasm_target,
                 .optimize = .ReleaseSmall,
                 .use_lld = false,
@@ -89,7 +89,7 @@ pub fn build(b: *std.Build) void {
     } else {
         artifact = b.addExecutable(.{ //
             .name = "pi-zig",
-            .root_source_file = .{ .path = "src/main.zig" },
+            .root_source_file = b.path("src/main.zig"),
             .target = target,
             .optimize = optimize,
             .single_threaded = true,
@@ -104,7 +104,7 @@ pub fn build(b: *std.Build) void {
     // Creates a step for unit testing. This only builds the test executable
     // but does not run it.
     const unit_tests = b.addTest(.{ //
-        .root_source_file = .{ .path = "src/main.zig" },
+        .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
         .use_lld = false,

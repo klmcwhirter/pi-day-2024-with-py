@@ -24,7 +24,7 @@ COPY --from=pythonbuild $PI_DIGITS_FILE $PI_DIGITS_FILE
 
 # RUN ZIGVER=0.11.0 && ZIGARCH=zig-linux-x86_64-$ZIGVER.tar.xz && ZIGBIN=zig-bin && \
 
-RUN ZIGVER=0.12.0 && ZIGARCH=zig-linux-x86_64-$ZIGVER.tar.xz && ZIGBIN=zig-bin && \
+RUN ZIGVER=0.13.0 && ZIGARCH=zig-linux-x86_64-$ZIGVER.tar.xz && ZIGBIN=zig-bin && \
     apk upgrade && \
     apk add binaryen && \
     wget -O $ZIGARCH https://ziglang.org/download/$ZIGVER/$ZIGARCH && \

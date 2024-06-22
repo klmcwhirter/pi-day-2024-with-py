@@ -59,8 +59,8 @@ then
 else
     mv step.out ${ZIG_TESTS}.skipped
 fi
-echo rm -fr zig-cache/ zig-out/
-rm -fr zig-cache/ zig-out/
+echo rm -fr .zig-cache/ zig-cache/ zig-out/
+rm -fr .zig-cache/ zig-cache/ zig-out/
 
 echo ${ZIGBIN}/zig build copy-js --summary all -Dwasm --verbose
 ${ZIGBIN}/zig build copy-js --summary all -Dwasm --verbose 2>&1 | tee -a step.out
