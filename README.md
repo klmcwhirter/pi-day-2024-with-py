@@ -11,6 +11,7 @@
 - [Summary](#summary)
 - [Downsides](./docs/wasm-downsides.md)
 - [Rabbit Holes I Travelled Down](./docs/rabbit-holes.md)
+- [Second Wind](./docs/second-wind.md)
 - [References](./docs/references.md)
 
 ---
