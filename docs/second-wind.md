@@ -24,6 +24,10 @@ But, then we learned more at WASM I/O 2024:
 * [Design Systems in Wasm: One year on the bumpy road to the component model](https://youtu.be/i9WYjoTPrHo) shows some of what is coming in the next 12 months
 * and so much more ...
 
+## CNCF - Cloud Native Wasm Day EU 2024
+* [YouTube playlist](https://www.youtube.com/playlist?list=PLj6h78yzYM2MQteKoXxICTWiUdZYEw6RI)
+* [Avoiding vendor lock in](https://youtu.be/vCwXSedT674)
+
 ## What Now?
 With over 30 sessions published, what should I focus on next?
 
@@ -46,7 +50,7 @@ Runner|Comments
 ------|--------
 [wasmtime](https://github.com/bytecodealliance/wasmtime)|The Byte Code Alliance runner written in Rust; uses the Cranelift code generator
 [wasmer](https://github.com/wasmerio/wasmer)|Written in Rust; no spec version mentioned but says implements WASIX, WASI and emscripten; supports the Single Pass, Cranelift and LLVM pluggable compilers
-[wazero](https://github.com/tetratelabs/wazero)|This is the runner of choice for most of the golang community. The main branch indicates support for WASM Core V1 and V2 specs
+[wazero](https://github.com/tetratelabs/wazero)|This is the runner of choice for most of the golang community. The main branch indicates support for WASM Core V1 and V2 specs; WASI preview 1
 
 ### Code Generators or Compilers
 
